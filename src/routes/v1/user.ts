@@ -15,6 +15,6 @@ router.use(publicRoutes)
 router.use(privateRoutes)
 
 privateRoutes.route('/delete-user/:id').delete(DeleteUser)
-privateRoutes.route('/me/:id').get(GetSelfuser)
+privateRoutes.route('/me').get(GetSelfuser)
 
 export default router
