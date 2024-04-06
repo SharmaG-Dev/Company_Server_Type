@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express'
 import cors from 'cors'
-import { Client } from './config/Client'
+import { prisma as Client } from './config/Client'
+import V1Routes from './routes/v1/app'
 
 const app = express()
 
@@ -16,6 +17,8 @@ Client.$connect()
   .catch((err) => {
     console.log(err.message)
   })
+
+app.use('/api/v1/', V1Routes)
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Welcome to the chatting server')

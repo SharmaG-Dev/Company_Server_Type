@@ -14,12 +14,24 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(uuid())
-  name     String  @db.VarChar(64)
-  email    String  @db.VarChar(120)
-  googleId String? @db.VarChar(200)
-  avatar   String? @db.VarChar(200)
-  password String  @db.VarChar(200)
+  id        String  @id @db.VarChar(64)
+  email     String  @db.VarChar(120)
+  googleId  String? @db.VarChar(200)
+  password  String  @db.VarChar(200)
+  profile   Profile @relation(fields: [profileId], references: [id])
+  profileId String  @db.VarChar(64)
 
   @@map("users")
+}
+
+model Profile {
+  id       String  @id @db.VarChar(64)
+  name     String  @db.VarChar(100)
+  avatar   String? @db.VarChar(200)
+  email    String  @db.VarChar(120)
+  active   Boolean @default(true)
+  googleId String? @db.VarChar(200)
+  User     User[]
+
+  @@map("profile")
 }

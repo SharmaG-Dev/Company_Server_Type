@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node ./dist/index.js",
     "build": "npx tsc",
-    "dev": "nodemon --exec ts-node ./src/index.ts"
+    "dev": "nodemon --exec ts-node ./src/index.ts",
+    "db:migrate": "npx prisma migrate dev --name",
+    "db:generate": "npx prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +29,7 @@
   "dependencies": {
     "@prisma/client": "^5.11.0",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "joi": "^17.12.2",
