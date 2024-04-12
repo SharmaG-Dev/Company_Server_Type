@@ -85,10 +85,18 @@ export async function Removeuser(id: string) {
 }
 
 export async function GetSingleUser(id: string) {
-  const _user = await prisma.user.findFirst({
-    where: { id: id },
-  })
-  return _user
+  try {
+    const _user = await prisma.user.findFirst({
+      where: { id: id },
+      include: {
+        profile: true
+      }
+    })
+    return _user
+  } catch (error) {
+    return error
+  }
+
 }
 
 // update user

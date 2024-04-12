@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { GetSingleUser, Removeuser } from '../func/user.func'
-import { User } from '@prisma/client'
+import { customRequest } from '../../../types/v1/request'
 
 export const DeleteUser = async (req: Request, res: Response) => {
   const { id } = req.params
@@ -14,8 +14,8 @@ export const DeleteUser = async (req: Request, res: Response) => {
   }
 }
 
-export const GetSelfuser = async (req: Request, res: Response) => {
-  const { id } = req.user as User
+export const GetSelfuser = async (req: customRequest, res: Response) => {
+  const { id } = req.user
 
   try {
     const response = await GetSingleUser(id)
@@ -26,3 +26,6 @@ export const GetSelfuser = async (req: Request, res: Response) => {
     res.status(500).json({ error: true, message: error })
   }
 }
+
+
+

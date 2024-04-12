@@ -1,23 +1,17 @@
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Response } from 'express'
 import Jwt from 'jsonwebtoken'
 import { config } from 'dotenv'
 import { TokenResponse } from '../../../types/v1/token'
 import { GetSingleUser } from '../func/user.func'
-import { User } from '@prisma/client'
+import { customRequest } from '../../../types/v1/request'
 
 config()
 
 // Extend the Request type to include the 'user' property
-declare global {
-  namespace Express {
-    interface Request {
-      user?: User
-    }
-  }
-}
+
 
 export async function Authorization(
-  req: Request,
+  req: customRequest,
   res: Response,
   next: NextFunction
 ) {
