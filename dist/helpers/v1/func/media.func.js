@@ -35,56 +35,68 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetSelfuser = exports.DeleteUser = void 0;
-var user_func_1 = require("../func/user.func");
-var DeleteUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var id, response, error_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                id = req.params.id;
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, (0, user_func_1.Removeuser)(id)];
-            case 2:
-                response = _a.sent();
-                if (!response)
-                    return [2 /*return*/, res.status(400).json({ error: true, message: 'failed to delete' })];
-                res.status(200).json({ error: false, message: 'success', data: response });
-                return [3 /*break*/, 4];
-            case 3:
-                error_1 = _a.sent();
-                res.status(500).json({ error: true, message: error_1 });
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
-        }
+exports.uploadSingle = exports.uploadFile = void 0;
+var UploadFiles_1 = require("../../../config/UploadFiles");
+var files_1 = require("../utils/files");
+var dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+function uploadFile(credentials) {
+    return __awaiter(this, void 0, void 0, function () {
+        var id, files, result, i, key, file, _fileName, params;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    id = credentials.id, files = credentials.files;
+                    result = [];
+                    i = 0;
+                    _a.label = 1;
+                case 1:
+                    if (!(i < files.length)) return [3 /*break*/, 4];
+                    key = id;
+                    file = files[i];
+                    _fileName = (0, files_1.genUniqueNames)(10);
+                    params = {
+                        Bucket: "".concat(process.env.S3_BUCKET),
+                        Key: "".concat(key, "/").concat(_fileName),
+                        Body: file.buffer,
+                        ContentType: file.mimetype,
+                        ContentDisposition: "inline; filename-'".concat(file.originalname, "'")
+                    };
+                    return [4 /*yield*/, uploadSingle(params)
+                            .then(function (res) { return result.push(res); })
+                            .catch(function (err) {
+                            throw err;
+                        })];
+                case 2:
+                    _a.sent();
+                    _a.label = 3;
+                case 3:
+                    i++;
+                    return [3 /*break*/, 1];
+                case 4: return [2 /*return*/, result];
+            }
+        });
     });
-}); };
-exports.DeleteUser = DeleteUser;
-var GetSelfuser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var id, response, error_2;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                id = req.user.id;
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, (0, user_func_1.GetSingleUser)(id)];
-            case 2:
-                response = _a.sent();
-                if (!response)
-                    return [2 /*return*/, res.status(400).json({ error: true, message: 'no user found' })];
-                res.status(200).json({ error: false, message: 'success', data: response });
-                return [3 /*break*/, 4];
-            case 3:
-                error_2 = _a.sent();
-                res.status(500).json({ error: true, message: error_2 });
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
-        }
+}
+exports.uploadFile = uploadFile;
+function uploadSingle(parms) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, new Promise(function (res, rej) {
+                    UploadFiles_1.S3Instance.upload(parms, function (err, data) {
+                        if (err) {
+                            rej(err);
+                        }
+                        else {
+                            res(data.Key);
+                        }
+                    });
+                })];
+        });
     });
-}); };
-exports.GetSelfuser = GetSelfuser;
+}
+exports.uploadSingle = uploadSingle;

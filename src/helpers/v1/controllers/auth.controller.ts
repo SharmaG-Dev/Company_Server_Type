@@ -15,7 +15,6 @@ export const Signup = async (req: Request, res: Response) => {
       payload: {
         id: response.id,
         email: response.email,
-        profileId: response.profileId,
       },
     })
 
@@ -47,7 +46,6 @@ export const Login = async (req: Request, res: Response) => {
       payload: {
         id: _user.id,
         email: _user.email,
-        profileId: _user.profileId,
       },
     })
     res

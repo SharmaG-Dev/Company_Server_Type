@@ -160,15 +160,24 @@ function Removeuser(id) {
 exports.Removeuser = Removeuser;
 function GetSingleUser(id) {
     return __awaiter(this, void 0, void 0, function () {
-        var _user;
+        var _user, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Client_1.prisma.user.findFirst({
-                        where: { id: id },
-                    })];
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, Client_1.prisma.user.findFirst({
+                            where: { id: id },
+                            include: {
+                                profile: true
+                            }
+                        })];
                 case 1:
                     _user = _a.sent();
                     return [2 /*return*/, _user];
+                case 2:
+                    error_1 = _a.sent();
+                    return [2 /*return*/, error_1];
+                case 3: return [2 /*return*/];
             }
         });
     });

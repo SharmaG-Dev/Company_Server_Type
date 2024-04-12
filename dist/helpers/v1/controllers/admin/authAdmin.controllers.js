@@ -39,46 +39,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Login = exports.Signup = void 0;
-var user_func_1 = require("../func/user.func");
-var Client_1 = require("../../../config/Client");
+exports.LoginAdmin = exports.SignupAdmin = void 0;
+var authAdmin_func_1 = require("../../func/admin/authAdmin.func");
 var crypto_1 = __importDefault(require("crypto"));
-var token_func_1 = require("../func/token.func");
-var Signup = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var data, response, token, error_1;
+var Client_1 = require("../../../../config/Client");
+var token_func_1 = require("../../func/token.func");
+var SignupAdmin = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var formdata, response, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                data = req.body;
+                formdata = req.body;
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, (0, user_func_1.ManageUserSignup)(data)];
+                return [4 /*yield*/, (0, authAdmin_func_1.CreateAdmin)(formdata)];
             case 2:
                 response = _a.sent();
                 if (!response)
-                    return [2 /*return*/, res.status(400).json({ error: true, message: 'failed to signup' })];
-                token = (0, token_func_1.CreateToken)({
-                    payload: {
-                        id: response.id,
-                        email: response.email,
-                    },
-                });
-                res
-                    .status(200)
-                    .json({ error: false, message: 'success', data: response, token: token });
+                    return [2 /*return*/, res.status(400).json({ error: true, message: response })];
+                res.status(200).json({ error: false, message: 'success', data: response });
                 return [3 /*break*/, 4];
             case 3:
                 error_1 = _a.sent();
-                res.status(500).json({ error: error_1 });
+                res.status(500).json({ error: true, message: error_1 });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
     });
 }); };
-exports.Signup = Signup;
-var Login = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, email, password, _user, hexPass, varifiedPassword, token, error_2;
+exports.SignupAdmin = SignupAdmin;
+var LoginAdmin = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, email, password, hashPass, _user, varifyPassword, token, error_2;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -86,31 +78,30 @@ var Login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
                 _b.label = 1;
             case 1:
                 _b.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, Client_1.prisma.user.findFirst({
-                        where: { email: email },
-                        include: { profile: true },
+                hashPass = '';
+                if (password) {
+                    hashPass = crypto_1.default.createHash('md5').update(password).digest('hex');
+                }
+                return [4 /*yield*/, Client_1.prisma.admin.findFirst({
+                        where: {
+                            email: email
+                        }
                     })];
             case 2:
                 _user = _b.sent();
                 if (!_user)
-                    return [2 /*return*/, res.status(404).json({ error: true, message: 'user not found' })
-                        // match password
-                    ];
-                hexPass = crypto_1.default.createHash('md5').update(password).digest('hex');
-                varifiedPassword = hexPass === _user.password;
-                if (!varifiedPassword)
-                    return [2 /*return*/, res.status(401).json({ error: true, message: 'invalid password' })
-                        // generate Token
-                    ];
+                    return [2 /*return*/, res.status(404).json({ error: true, message: 'no user found' })];
+                varifyPassword = _user.password === hashPass;
+                if (!varifyPassword)
+                    return [2 /*return*/, res.status(401).json({ error: true, message: 'invalid password' })];
                 token = (0, token_func_1.CreateToken)({
                     payload: {
-                        id: _user.id,
                         email: _user.email,
-                    },
+                        id: _user.id,
+                        role: 'admin'
+                    }
                 });
-                res
-                    .status(200)
-                    .json({ error: false, message: 'success', data: _user, token: token });
+                res.status(200).json({ error: false, message: 'success', data: _user, token: token });
                 return [3 /*break*/, 4];
             case 3:
                 error_2 = _b.sent();
@@ -120,4 +111,4 @@ var Login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
         }
     });
 }); };
-exports.Login = Login;
+exports.LoginAdmin = LoginAdmin;

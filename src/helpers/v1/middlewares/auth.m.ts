@@ -4,6 +4,7 @@ import { config } from 'dotenv'
 import { TokenResponse } from '../../../types/v1/token'
 import { GetSingleUser } from '../func/user.func'
 import { customRequest } from '../../../types/v1/request'
+import { GetselfAdmin } from '../func/admin/authAdmin.func'
 
 config()
 
@@ -27,9 +28,16 @@ export async function Authorization(
       async function (error, decode) {
         if (error)
           return res.status(401).json({ error: true, message: error.message })
-        const { id } = decode as Partial<TokenResponse>
+        const { id, role } = decode as Partial<TokenResponse>
 
-        const _user = await GetSingleUser(id as string)
+        let _user
+
+        if (role && role === 'admin') {
+          _user = await GetselfAdmin(id as string)
+        } else {
+          _user = await GetSingleUser(id as string)
+
+        }
 
         if (!_user)
           return res.status(401).json({ error: true, message: 'no user found' })

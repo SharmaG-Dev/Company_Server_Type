@@ -24,4 +24,34 @@ export const deleteUserSchema = joi.object({
 
 
 
+export const AdminSignupSchema = joi.object({
+    name: joi.string().required(),
+    email: joi.string().email().required(),
+    password: joi.string().required().min(6),
+    avatar: joi.string().required()
+})
+
+
+export const AdminLoginSchema = joi.object({
+    email: joi.string().email().required(),
+    password: joi.string().required().min(6)
+})
+
+
+
+export const TagsValidateSchema = joi.object({
+    title: joi.string().required().min(1)
+})
+
+
+export const TagsDeleteValidateSchema = joi.object({
+    id: joi.string().required().uuid()
+})
+
+export const TagsGetValidateSchem = joi.object({
+    id: joi.string().uuid().optional(),
+    active: joi.string().optional()
+})
+
+
 

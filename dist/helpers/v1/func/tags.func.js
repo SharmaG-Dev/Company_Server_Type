@@ -36,55 +36,64 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetSelfuser = exports.DeleteUser = void 0;
-var user_func_1 = require("../func/user.func");
-var DeleteUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var id, response, error_1;
+exports.GetActiveTags = exports.GetTags = exports.deactivateTag = exports.CreateTag = void 0;
+var Client_1 = require("../../../config/Client");
+var CreateTag = function (input) { return __awaiter(void 0, void 0, void 0, function () {
+    var title, _tag, response;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                id = req.params.id;
-                _a.label = 1;
+                title = input.title;
+                _tag = {
+                    title: title
+                };
+                return [4 /*yield*/, Client_1.prisma.tags.create({ data: _tag })];
             case 1:
-                _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, (0, user_func_1.Removeuser)(id)];
-            case 2:
                 response = _a.sent();
-                if (!response)
-                    return [2 /*return*/, res.status(400).json({ error: true, message: 'failed to delete' })];
-                res.status(200).json({ error: false, message: 'success', data: response });
-                return [3 /*break*/, 4];
-            case 3:
-                error_1 = _a.sent();
-                res.status(500).json({ error: true, message: error_1 });
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+                return [2 /*return*/, response];
         }
     });
 }); };
-exports.DeleteUser = DeleteUser;
-var GetSelfuser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var id, response, error_2;
+exports.CreateTag = CreateTag;
+var deactivateTag = function (id) { return __awaiter(void 0, void 0, void 0, function () {
+    var _deletedData;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                id = req.user.id;
-                _a.label = 1;
+            case 0: return [4 /*yield*/, Client_1.prisma.tags.update({ where: { id: id }, data: { isActive: false } })];
             case 1:
-                _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, (0, user_func_1.GetSingleUser)(id)];
-            case 2:
-                response = _a.sent();
-                if (!response)
-                    return [2 /*return*/, res.status(400).json({ error: true, message: 'no user found' })];
-                res.status(200).json({ error: false, message: 'success', data: response });
-                return [3 /*break*/, 4];
-            case 3:
-                error_2 = _a.sent();
-                res.status(500).json({ error: true, message: error_2 });
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+                _deletedData = _a.sent();
+                return [2 /*return*/, _deletedData];
         }
     });
 }); };
-exports.GetSelfuser = GetSelfuser;
+exports.deactivateTag = deactivateTag;
+var GetTags = function (_a) { return __awaiter(void 0, [_a], void 0, function (_b) {
+    var _find, response;
+    var id = _b.id;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
+            case 0:
+                _find = {};
+                if (id) {
+                    _find = { where: { id: id } };
+                }
+                return [4 /*yield*/, Client_1.prisma.tags.findMany(_find)];
+            case 1:
+                response = _c.sent();
+                return [2 /*return*/, response];
+        }
+    });
+}); };
+exports.GetTags = GetTags;
+var GetActiveTags = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var response;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, Client_1.prisma.tags.findMany({ where: { isActive: true } })];
+            case 1:
+                response = _a.sent();
+                return [2 /*return*/, response];
+        }
+    });
+}); };
+exports.GetActiveTags = GetActiveTags;

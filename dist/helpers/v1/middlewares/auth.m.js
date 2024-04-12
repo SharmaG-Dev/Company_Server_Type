@@ -43,7 +43,9 @@ exports.Authorization = void 0;
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var dotenv_1 = require("dotenv");
 var user_func_1 = require("../func/user.func");
+var authAdmin_func_1 = require("../func/admin/authAdmin.func");
 (0, dotenv_1.config)();
+// Extend the Request type to include the 'user' property
 function Authorization(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
         var token;
@@ -55,16 +57,23 @@ function Authorization(req, res, next) {
                     return [2 /*return*/, res.status(401).json({ error: true, message: 'token not found' })];
                 jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY, function (error, decode) {
                     return __awaiter(this, void 0, void 0, function () {
-                        var id, _user;
-                        return __generator(this, function (_a) {
-                            switch (_a.label) {
+                        var _a, id, role, _user;
+                        return __generator(this, function (_b) {
+                            switch (_b.label) {
                                 case 0:
                                     if (error)
                                         return [2 /*return*/, res.status(401).json({ error: true, message: error.message })];
-                                    id = decode.id;
-                                    return [4 /*yield*/, (0, user_func_1.GetSingleUser)(id)];
+                                    _a = decode, id = _a.id, role = _a.role;
+                                    if (!(role && role === 'admin')) return [3 /*break*/, 2];
+                                    return [4 /*yield*/, (0, authAdmin_func_1.GetselfAdmin)(id)];
                                 case 1:
-                                    _user = _a.sent();
+                                    _user = _b.sent();
+                                    return [3 /*break*/, 4];
+                                case 2: return [4 /*yield*/, (0, user_func_1.GetSingleUser)(id)];
+                                case 3:
+                                    _user = _b.sent();
+                                    _b.label = 4;
+                                case 4:
                                     if (!_user)
                                         return [2 /*return*/, res.status(401).json({ error: true, message: 'no user found' })
                                             // Assign _user to req.user

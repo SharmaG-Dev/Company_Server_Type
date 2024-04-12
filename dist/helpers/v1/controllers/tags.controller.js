@@ -35,89 +35,101 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Login = exports.Signup = void 0;
-var user_func_1 = require("../func/user.func");
-var Client_1 = require("../../../config/Client");
-var crypto_1 = __importDefault(require("crypto"));
-var token_func_1 = require("../func/token.func");
-var Signup = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var data, response, token, error_1;
+exports.GetTagsActiveList = exports.GetTagsList = exports.deleteTag = exports.RegisterTag = void 0;
+var tags_func_1 = require("../func/tags.func");
+var RegisterTag = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var formdata, response, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                data = req.body;
+                formdata = req.body;
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, (0, user_func_1.ManageUserSignup)(data)];
+                return [4 /*yield*/, (0, tags_func_1.CreateTag)(formdata)];
             case 2:
                 response = _a.sent();
                 if (!response)
-                    return [2 /*return*/, res.status(400).json({ error: true, message: 'failed to signup' })];
-                token = (0, token_func_1.CreateToken)({
-                    payload: {
-                        id: response.id,
-                        email: response.email,
-                    },
-                });
-                res
-                    .status(200)
-                    .json({ error: false, message: 'success', data: response, token: token });
+                    return [2 /*return*/, res.status(400).json({ error: true, message: response })];
+                res.status(200).json({ error: false, message: 'success', data: response });
                 return [3 /*break*/, 4];
             case 3:
                 error_1 = _a.sent();
-                res.status(500).json({ error: error_1 });
+                res.status(500).json({ error: true, message: error_1 });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
     });
 }); };
-exports.Signup = Signup;
-var Login = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, email, password, _user, hexPass, varifiedPassword, token, error_2;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+exports.RegisterTag = RegisterTag;
+var deleteTag = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var id, response, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
-                _a = req.body, email = _a.email, password = _a.password;
-                _b.label = 1;
+                id = req.params.id;
+                _a.label = 1;
             case 1:
-                _b.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, Client_1.prisma.user.findFirst({
-                        where: { email: email },
-                        include: { profile: true },
-                    })];
+                _a.trys.push([1, 3, , 4]);
+                return [4 /*yield*/, (0, tags_func_1.deactivateTag)(id)];
             case 2:
-                _user = _b.sent();
-                if (!_user)
-                    return [2 /*return*/, res.status(404).json({ error: true, message: 'user not found' })
-                        // match password
-                    ];
-                hexPass = crypto_1.default.createHash('md5').update(password).digest('hex');
-                varifiedPassword = hexPass === _user.password;
-                if (!varifiedPassword)
-                    return [2 /*return*/, res.status(401).json({ error: true, message: 'invalid password' })
-                        // generate Token
-                    ];
-                token = (0, token_func_1.CreateToken)({
-                    payload: {
-                        id: _user.id,
-                        email: _user.email,
-                    },
-                });
-                res
-                    .status(200)
-                    .json({ error: false, message: 'success', data: _user, token: token });
+                response = _a.sent();
+                if (!response)
+                    return [2 /*return*/, res.status(400).json({ error: true, message: response })];
+                res.status(200).json({ error: false, message: 'success', data: response });
                 return [3 /*break*/, 4];
             case 3:
-                error_2 = _b.sent();
+                error_2 = _a.sent();
                 res.status(500).json({ error: true, message: error_2 });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
     });
 }); };
-exports.Login = Login;
+exports.deleteTag = deleteTag;
+var GetTagsList = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var id, response, error_3;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                id = req.query.id;
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 3, , 4]);
+                return [4 /*yield*/, (0, tags_func_1.GetTags)({ id: id })];
+            case 2:
+                response = _a.sent();
+                if (!response)
+                    return [2 /*return*/, res.status(404).json({ error: true, message: response })];
+                res.status(200).json({ error: false, message: 'success', data: response });
+                return [3 /*break*/, 4];
+            case 3:
+                error_3 = _a.sent();
+                res.status(500).json({ error: true, message: error_3 });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+exports.GetTagsList = GetTagsList;
+var GetTagsActiveList = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var response, error_4;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, (0, tags_func_1.GetActiveTags)()];
+            case 1:
+                response = _a.sent();
+                res.status(200).json({ error: false, message: 'success', data: response });
+                return [3 /*break*/, 3];
+            case 2:
+                error_4 = _a.sent();
+                res.status(500).json({ error: true, message: error_4 });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
+exports.GetTagsActiveList = GetTagsActiveList;

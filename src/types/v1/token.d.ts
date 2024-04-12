@@ -1,7 +1,7 @@
 export interface tokenInput {
   id: string
   email: string
-  profileId: string
+  role?: string
 }
 
 export interface TokenResponse extends Partial<tokenInput> {

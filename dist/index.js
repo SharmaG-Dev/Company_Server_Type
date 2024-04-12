@@ -7,8 +7,11 @@ var express_1 = __importDefault(require("express"));
 var cors_1 = __importDefault(require("cors"));
 var Client_1 = require("./config/Client");
 var app_1 = __importDefault(require("./routes/v1/app"));
+var multer_1 = __importDefault(require("multer"));
 var app = (0, express_1.default)();
 var port = parseInt(process.env.PORT || '5000', 10);
+var upload = (0, multer_1.default)().any();
+app.use(upload);
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 Client_1.prisma.$connect()

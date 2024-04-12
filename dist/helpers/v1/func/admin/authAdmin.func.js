@@ -35,56 +35,49 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetSelfuser = exports.DeleteUser = void 0;
-var user_func_1 = require("../func/user.func");
-var DeleteUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var id, response, error_1;
+exports.GetselfAdmin = exports.CreateAdmin = void 0;
+var crypto_1 = __importDefault(require("crypto"));
+var Client_1 = require("../../../../config/Client");
+var CreateAdmin = function (input) { return __awaiter(void 0, void 0, void 0, function () {
+    var hashPass, _input, response;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                id = req.params.id;
-                _a.label = 1;
+                hashPass = '';
+                if (input.password) {
+                    hashPass = crypto_1.default.createHash('md5').update(input.password).digest('hex');
+                }
+                _input = {
+                    name: input.name,
+                    email: input.email,
+                    avatar: input.avatar,
+                    password: hashPass
+                };
+                return [4 /*yield*/, Client_1.prisma.admin.create({ data: _input })];
             case 1:
-                _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, (0, user_func_1.Removeuser)(id)];
-            case 2:
                 response = _a.sent();
-                if (!response)
-                    return [2 /*return*/, res.status(400).json({ error: true, message: 'failed to delete' })];
-                res.status(200).json({ error: false, message: 'success', data: response });
-                return [3 /*break*/, 4];
-            case 3:
-                error_1 = _a.sent();
-                res.status(500).json({ error: true, message: error_1 });
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+                return [2 /*return*/, response];
         }
     });
 }); };
-exports.DeleteUser = DeleteUser;
-var GetSelfuser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var id, response, error_2;
+exports.CreateAdmin = CreateAdmin;
+var GetselfAdmin = function (id) { return __awaiter(void 0, void 0, void 0, function () {
+    var _admin;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                id = req.user.id;
-                _a.label = 1;
+            case 0: return [4 /*yield*/, Client_1.prisma.admin.findFirst({
+                    where: {
+                        id: id
+                    }
+                })];
             case 1:
-                _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, (0, user_func_1.GetSingleUser)(id)];
-            case 2:
-                response = _a.sent();
-                if (!response)
-                    return [2 /*return*/, res.status(400).json({ error: true, message: 'no user found' })];
-                res.status(200).json({ error: false, message: 'success', data: response });
-                return [3 /*break*/, 4];
-            case 3:
-                error_2 = _a.sent();
-                res.status(500).json({ error: true, message: error_2 });
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+                _admin = _a.sent();
+                return [2 /*return*/, _admin];
         }
     });
 }); };
-exports.GetSelfuser = GetSelfuser;
+exports.GetselfAdmin = GetselfAdmin;
