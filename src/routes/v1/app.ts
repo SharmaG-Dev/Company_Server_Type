@@ -5,6 +5,8 @@ import ProfileRoutes from './profile'
 import UploadRoutes from './upload'
 import AdminRoutes from './admin/index'
 import TagsRoutes from './tags'
+import BlogRoutes from './blog'
+
 
 const router = express.Router()
 
@@ -14,5 +16,6 @@ router.use('/profile', ProfileRoutes)
 router.use('/upload', UploadRoutes)
 router.use('/admin', AdminRoutes)
 router.use('/tags', TagsRoutes)
+router.use('/blog', BlogRoutes)
 
 export default router

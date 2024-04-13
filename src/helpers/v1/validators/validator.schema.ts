@@ -55,3 +55,22 @@ export const TagsGetValidateSchem = joi.object({
 
 
 
+export const BlogCreateValidateschema = joi.object({
+    title: joi.string().required().min(1),
+    images: joi.array().required().min(1),
+    sortDisc: joi.string().required().min(1),
+    longDisc: joi.string().required().min(1),
+    BlogTags: joi.array().required().min(1),
+    profileId: joi.string().required()
+
+})
+
+export const BlogGetValidatesSchema = joi.object({
+    id: joi.string().uuid()
+})
+export const BlogDeleteSchema = joi.object({
+    id: joi.string().uuid()
+})
+
+
+
