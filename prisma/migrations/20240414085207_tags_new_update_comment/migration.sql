@@ -29,6 +29,8 @@ CREATE TABLE "profile" (
 CREATE TABLE "blogs" (
     "id" VARCHAR(36) NOT NULL,
     "title" VARCHAR(180) NOT NULL,
+    "sortDisc" VARCHAR(180) NOT NULL,
+    "images" TEXT[],
     "longDisc" VARCHAR(8000) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" TIMESTAMP(3) NOT NULL,
@@ -38,23 +40,12 @@ CREATE TABLE "blogs" (
 );
 
 -- CreateTable
-CREATE TABLE "images" (
-    "id" VARCHAR(36) NOT NULL,
-    "url" VARCHAR(300) NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updateAt" TIMESTAMP(3) NOT NULL,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "blogId" TEXT NOT NULL,
-
-    CONSTRAINT "images_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "tags" (
     "id" VARCHAR(36) NOT NULL,
     "title" VARCHAR(100) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdById" VARCHAR(64),
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
     "updateAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "tags_pkey" PRIMARY KEY ("id")
@@ -76,8 +67,8 @@ CREATE TABLE "comments" (
     "comment" VARCHAR(200) NOT NULL,
     "isSubComment" BOOLEAN NOT NULL DEFAULT false,
     "commentId" VARCHAR(36),
-    "profileId" VARCHAR(64),
-    "blogId" VARCHAR(36),
+    "profileId" VARCHAR(64) NOT NULL,
+    "blogId" VARCHAR(36) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -111,14 +102,28 @@ CREATE TABLE "view" (
     CONSTRAINT "view_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "admin" (
+    "id" VARCHAR(36) NOT NULL,
+    "name" VARCHAR(60) NOT NULL,
+    "email" VARCHAR(80) NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "password" VARCHAR(80) NOT NULL,
+    "avatar" VARCHAR(120) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "admin_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "tags_title_key" ON "tags"("title");
+
 -- AddForeignKey
 ALTER TABLE "users" ADD CONSTRAINT "users_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "profile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "blogs" ADD CONSTRAINT "blogs_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "profile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "images" ADD CONSTRAINT "images_blogId_fkey" FOREIGN KEY ("blogId") REFERENCES "blogs"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "tags" ADD CONSTRAINT "tags_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "profile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -133,10 +138,10 @@ ALTER TABLE "blog_tags" ADD CONSTRAINT "blog_tags_tagId_fkey" FOREIGN KEY ("tagI
 ALTER TABLE "comments" ADD CONSTRAINT "comments_commentId_fkey" FOREIGN KEY ("commentId") REFERENCES "comments"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "comments" ADD CONSTRAINT "comments_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "profile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "comments" ADD CONSTRAINT "comments_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "profile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "comments" ADD CONSTRAINT "comments_blogId_fkey" FOREIGN KEY ("blogId") REFERENCES "blogs"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "comments" ADD CONSTRAINT "comments_blogId_fkey" FOREIGN KEY ("blogId") REFERENCES "blogs"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "likes" ADD CONSTRAINT "likes_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

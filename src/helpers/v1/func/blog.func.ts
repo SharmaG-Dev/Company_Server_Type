@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { genId, prisma } from '../../../config/Client';
-import { BlogCreateDataType } from '../../../types/v1/blog';
+import { BlogCreateDataType, LikesInput, ViewsInput, commentInputs } from '../../../types/v1/blog';
+
 
 
 
@@ -52,25 +53,92 @@ export async function CreateBlogPost(input: BlogCreateDataType) {
 
 
 
-export const GetBlogPost = async ({ id }: { id?: string }) => {
-    const _find: any = {
+export const GetBlogPost = async () => {
+
+
+    const _blogs = await prisma.blog.findMany({
         include: {
             BlogTags: {
-                include: {
-                    tag: true
+                select: {
+                    tag: {
+                        select: {
+                            id: true,
+                            title: true
+                        }
+                    }
                 }
             },
-            profile: true
+            profile: {
+                select: {
+                    id: true,
+                    name: true,
+                    avatar: true,
+                },
+            },
+            _count: {
+                select: {
+                    comments: {
+                        where: { isSubComment: false }
+                    },
+                    Likes: {
+                        where: { isBlog: true }
+                    },
+                    Views: {
+                        where: { isBlog: true }
+                    }
+                }
+            }
         }
-    };
-
-    if (id) {
-        _find.where = { id };
-    }
-    const _blogs = await prisma.blog.findMany(_find);
+    });
 
     return _blogs;
 };
+
+
+export const GetSingleBlog = async (blogId: string) => {
+    const response = await prisma.blog.findUnique({
+        where: {
+            id: blogId
+        },
+        include: {
+            BlogTags: {
+                select: {
+                    tag: {
+                        select: {
+                            id: true,
+                            title: true
+                        }
+                    }
+                }
+            },
+            profile: {
+                select: {
+                    id: true,
+                    name: true,
+                    avatar: true,
+                },
+            },
+            _count: {
+                select: {
+                    comments: {
+                        where: { isSubComment: false }
+                    },
+                    Likes: {
+                        where: { isBlog: true }
+                    },
+                    Views: {
+                        where: { isBlog: true }
+                    }
+                }
+            }
+        }
+    })
+
+    return response
+}
+
+
+
 
 
 
@@ -104,4 +172,104 @@ export const GetprofileBlogs = async ({ profileId }: { profileId: string }) => {
         }
     })
     return _blogs
+}
+
+
+
+
+export const CreateComment = async (input: commentInputs) => {
+    const { comment, profileId, commentId, blogId } = input
+
+    const isSubComment = Boolean(commentId)
+    const _create = await prisma.comments.create({
+        data: {
+            comment: comment,
+            blogId: blogId,
+            profileId: profileId,
+            isSubComment: isSubComment,
+            commentId: commentId || null
+        }
+    })
+
+    return _create;
+};
+
+
+export const DeleteComment = async (commentId: string) => {
+
+
+
+    const deleteSubComment = await prisma.comments.delete({
+        where: { id: commentId }, include: {
+            subComments: true
+        }
+    })
+
+    return deleteSubComment
+};
+
+
+
+
+// likes functions 
+
+export const RecordLikes = async (input: LikesInput) => {
+    const { userId, blogId, commentsId } = input
+
+    const isBlog = Boolean(blogId)
+    const isComment = Boolean(commentsId)
+
+    const _likes = await prisma.likes.create({
+        data: {
+            isBlog: isBlog,
+            isComment: isComment,
+            userId: userId,
+            commentsId: commentsId,
+            blogId: blogId
+        },
+
+    })
+
+
+    return _likes
+}
+
+
+export const RemoveLike = async (input: LikesInput) => {
+
+    const { userId, blogId, commentsId } = input
+
+    const _deletedLike = await prisma.likes.deleteMany({
+        where: {
+            userId: userId,
+            blogId: blogId,
+            commentsId: commentsId
+        }
+    })
+
+    return _deletedLike
+}
+
+
+
+
+// view Funtions 
+
+export const ViewRegister = async (input: ViewsInput) => {
+
+    const { userid, blogId, profileId } = input
+
+    const isBlog = Boolean(blogId)
+    const isProfile = Boolean(profileId)
+
+    const _views = await prisma.view.create({
+        data: {
+            isBlog: isBlog,
+            isProfile: isProfile,
+            userid: userid,
+            blogId: blogId,
+            profileId: profileId,
+        }
+    })
+    return _views
 }
