@@ -88,6 +88,9 @@ export const GetBlogPost = async () => {
                     }
                 }
             }
+        },
+        orderBy: {
+            createdAt: 'desc'
         }
     });
 

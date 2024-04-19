@@ -3,6 +3,7 @@ import { ManageUserSignup } from '../func/user.func'
 import { prisma } from '../../../config/Client'
 import crypto from 'crypto'
 import { CreateToken } from '../func/token.func'
+import EventTracker from './../../../config/eventEmitter'
 
 export const Signup = async (req: Request, res: Response) => {
   const data = req.body
@@ -40,7 +41,7 @@ export const Login = async (req: Request, res: Response) => {
     const varifiedPassword = hexPass === _user.password
     if (!varifiedPassword)
       return res.status(401).json({ error: true, message: 'invalid password' })
-
+    EventTracker.emit('users:active', _user.id)
     // generate Token
     const token = CreateToken({
       payload: {

@@ -3,6 +3,7 @@ import { BlogCreateDataType } from '../../../types/v1/blog';
 import { CreateBlogPost, CreateComment, DeleteBlog, DeleteComment, GetBlogPost, GetSingleBlog, GetprofileBlogs, RecordLikes, RemoveLike, ViewRegister } from '../func/blog.func';
 import { customRequest } from '../../../types/v1/request';
 import { User } from '@prisma/client';
+import EventTracker from './../../../config/eventEmitter'
 
 
 
@@ -12,6 +13,7 @@ export const CreateBlog = async (req: Request, res: Response) => {
     try {
         const response = await CreateBlogPost(formdata)
         if (!response) return res.status(400).json({ error: true, message: response })
+        EventTracker.emit('Blog:new')
         res.status(200).json({ error: false, message: 'success', data: response })
     } catch (error) {
         res.status(500).json({ error: true, message: error })
