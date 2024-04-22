@@ -130,11 +130,7 @@ export async function AcceptFriendRequest(input: FriendRequestInputCreate) {
         id: _updated.receiverId,
       },
       data: {
-        friendsList: {
-          connect: {
-            id: senderId,
-          },
-        },
+        friendId: senderId
       },
     });
 
@@ -143,11 +139,7 @@ export async function AcceptFriendRequest(input: FriendRequestInputCreate) {
         id: _updated.senderId,
       },
       data: {
-        friendsList: {
-          connect: {
-            id: receiverId,
-          },
-        },
+        friendId: receiverId
       },
     });
 
@@ -170,7 +162,7 @@ export async function RemoveFriend(input: removeFriendsInput) {
       },
       data: {
         friendsList: {
-          delete: {
+          disconnect: {
             id: userProfileId
           }
         }
@@ -182,7 +174,7 @@ export async function RemoveFriend(input: removeFriendsInput) {
       },
       data: {
         friendsList: {
-          delete: {
+          disconnect: {
             id: profileId
           }
         }
