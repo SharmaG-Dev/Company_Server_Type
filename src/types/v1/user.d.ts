@@ -12,3 +12,5 @@ export interface UserUpdateInput extends Partial<User> {
   email?: string
   name?: string
 }
+
+

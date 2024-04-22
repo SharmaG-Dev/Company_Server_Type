@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "Status" AS ENUM ('pending', 'rejected', 'accepted');
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" VARCHAR(64) NOT NULL,
@@ -21,8 +24,21 @@ CREATE TABLE "profile" (
     "googleId" VARCHAR(200),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" TIMESTAMP(3) NOT NULL,
+    "friendId" VARCHAR(36),
 
     CONSTRAINT "profile_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "FriendsRequest" (
+    "id" TEXT NOT NULL,
+    "status" "Status" NOT NULL DEFAULT 'pending',
+    "receiverId" VARCHAR(36) NOT NULL,
+    "senderId" VARCHAR(36) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updateAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "FriendsRequest_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -94,6 +110,7 @@ CREATE TABLE "view" (
     "id" VARCHAR(36) NOT NULL,
     "isBlog" BOOLEAN NOT NULL DEFAULT true,
     "isProfile" BOOLEAN NOT NULL DEFAULT false,
+    "userid" VARCHAR(36) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "blogId" VARCHAR(36),
@@ -121,6 +138,15 @@ CREATE UNIQUE INDEX "tags_title_key" ON "tags"("title");
 
 -- AddForeignKey
 ALTER TABLE "users" ADD CONSTRAINT "users_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "profile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "profile" ADD CONSTRAINT "profile_friendId_fkey" FOREIGN KEY ("friendId") REFERENCES "profile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "FriendsRequest" ADD CONSTRAINT "FriendsRequest_receiverId_fkey" FOREIGN KEY ("receiverId") REFERENCES "profile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "FriendsRequest" ADD CONSTRAINT "FriendsRequest_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "profile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "blogs" ADD CONSTRAINT "blogs_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "profile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -151,6 +177,9 @@ ALTER TABLE "likes" ADD CONSTRAINT "likes_commentsId_fkey" FOREIGN KEY ("comment
 
 -- AddForeignKey
 ALTER TABLE "likes" ADD CONSTRAINT "likes_blogId_fkey" FOREIGN KEY ("blogId") REFERENCES "blogs"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "view" ADD CONSTRAINT "view_userid_fkey" FOREIGN KEY ("userid") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "view" ADD CONSTRAINT "view_blogId_fkey" FOREIGN KEY ("blogId") REFERENCES "blogs"("id") ON DELETE SET NULL ON UPDATE CASCADE;

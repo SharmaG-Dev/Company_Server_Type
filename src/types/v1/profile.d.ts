@@ -1,4 +1,4 @@
-import { Profile } from '@prisma/client'
+import { FriendsRequest, Profile } from '@prisma/client'
 
 export interface ProfileInput {
   name: string
@@ -17,4 +17,17 @@ export interface ProfileGetParams {
   active?: boolean
   email?: string
   name?: string
+}
+
+
+export interface FriendRequestInputCreate extends Partial<FriendsRequest> {
+  receiverId: string
+  senderId: string
+}
+
+
+
+export interface removeFriendsInput {
+  userProfileId: string
+  profileId: string
 }

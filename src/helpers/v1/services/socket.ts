@@ -12,7 +12,7 @@ export const handleSocket = async (socket: Socket) => {
 
     socket.on('blogs', async () => {
         const _blogs = await GetBlogPost()
-        socket.broadcast.emit('blogs', JSON.stringify(_blogs))
+        socket.emit('blogs', JSON.stringify(_blogs))
     })
 
     EventTracker.on('users:active', (data) => {
@@ -24,7 +24,6 @@ export const handleSocket = async (socket: Socket) => {
         const _blogs = await GetBlogPost()
         socket.broadcast.emit('blogs', JSON.stringify(_blogs))
     })
-
 }
 
 

@@ -1,9 +1,11 @@
 import { Prisma } from '@prisma/client'
 import { genId, prisma } from '../../../config/Client'
 import {
+  FriendRequestInputCreate,
   ProfileGetParams,
   ProfileInput,
   ProfileUpdateInput,
+  removeFriendsInput,
 } from '../../../types/v1/profile'
 
 export async function CreateProfile(input: ProfileInput) {
@@ -54,9 +56,142 @@ export async function GetProfiles(params: ProfileGetParams) {
     where: {
       ...params,
     },
+    include: {
+      friendRequestRecieved: true,
+      friendRequestSent: true,
+      friendsList: true
+    }
   })
   return _profiles
 }
 
 
+export async function GetSingleprofile(profileId: string) {
+  const _profile = await prisma.profile.findUnique({
+    where: {
+      id: profileId
+    },
+    include: {
+      friendRequestRecieved: true,
+      friendRequestSent: true,
+      friendsList: true,
+    }
+  })
 
+  return _profile
+}
+
+
+
+
+
+// Friends Request Api  
+
+
+export async function CreateFriendRequest(input: FriendRequestInputCreate) {
+  const { receiverId, senderId } = input
+
+
+  const response = await prisma.friendsRequest.create({
+    data: {
+      receiverId: receiverId,
+      senderId: senderId
+    }
+  })
+
+  return response
+}
+
+
+
+export async function AcceptFriendRequest(input: FriendRequestInputCreate) {
+  try {
+    const { id, senderId, receiverId, status } = input;
+
+    const _updated = await prisma.friendsRequest.update({
+      where: {
+        id: id,
+      },
+      data: {
+        status: status,
+      },
+    });
+
+    if (!_updated) {
+      return 'no request found ';
+    }
+
+    if (_updated.status === 'rejected') {
+      return _updated;
+    }
+
+    await prisma.profile.update({
+      where: {
+        id: _updated.receiverId,
+      },
+      data: {
+        friendsList: {
+          connect: {
+            id: senderId,
+          },
+        },
+      },
+    });
+
+    await prisma.profile.update({
+      where: {
+        id: _updated.senderId,
+      },
+      data: {
+        friendsList: {
+          connect: {
+            id: receiverId,
+          },
+        },
+      },
+    });
+
+    return 'Friend request accepted successfully';
+  } catch (error) {
+    // Handle error
+    console.error('Error accepting friend request:', error);
+    throw new Error('Failed to accept friend request');
+  }
+}
+
+
+export async function RemoveFriend(input: removeFriendsInput) {
+  const { userProfileId, profileId } = input
+
+  const [_userUpdate, secondUserUpdate] = await Promise.all([
+    prisma.profile.update({
+      where: {
+        id: profileId
+      },
+      data: {
+        friendsList: {
+          delete: {
+            id: userProfileId
+          }
+        }
+      }
+    }),
+    prisma.profile.update({
+      where: {
+        id: userProfileId
+      },
+      data: {
+        friendsList: {
+          delete: {
+            id: profileId
+          }
+        }
+      }
+    })
+  ])
+
+
+  if (!_userUpdate && !secondUserUpdate) throw Error('failed to remove friend')
+
+  return 'successfully removed friend'
+}

@@ -29,22 +29,43 @@ model User {
 }
 
 model Profile {
-  id        String   @id @db.VarChar(64)
-  name      String   @db.VarChar(100)
-  avatar    String?  @db.VarChar(200)
-  email     String   @db.VarChar(120)
-  active    Boolean  @default(true)
-  googleId  String?  @db.VarChar(200)
-  createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
-
-  comments Comments[]
-  User     User[]
-  tags     Tags[]
-  Blog     Blog[]
-  Views    View[]
+  id                    String           @id @db.VarChar(64)
+  name                  String           @db.VarChar(100)
+  avatar                String?          @db.VarChar(200)
+  email                 String           @db.VarChar(120)
+  active                Boolean          @default(true)
+  googleId              String?          @db.VarChar(200)
+  createdAt             DateTime         @default(now())
+  updateAt              DateTime         @updatedAt
+  friendId              String?          @db.VarChar(36)
+  profile               Profile?         @relation("Friends", fields: [friendId], references: [id])
+  friendsList           Profile[]        @relation("Friends")
+  comments              Comments[]
+  User                  User[]
+  tags                  Tags[]
+  Blog                  Blog[]
+  Views                 View[]
+  friendRequestSent     FriendsRequest[] @relation("friendRequestSent")
+  friendRequestRecieved FriendsRequest[] @relation("friendRequestRecieved")
 
   @@map("profile")
+}
+
+enum Status {
+  pending
+  rejected
+  accepted
+}
+
+model FriendsRequest {
+  id         String   @id @default(uuid())
+  status     Status   @default(pending)
+  receiverId String   @db.VarChar(36)
+  receiver   Profile  @relation("friendRequestRecieved", fields: [receiverId], references: [id])
+  senderId   String   @db.VarChar(36)
+  sender     Profile  @relation("friendRequestSent", fields: [senderId], references: [id])
+  createdAt  DateTime @default(now())
+  updateAt   DateTime @updatedAt
 }
 
 model Blog {
