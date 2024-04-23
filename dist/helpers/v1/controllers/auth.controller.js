@@ -44,6 +44,7 @@ var user_func_1 = require("../func/user.func");
 var Client_1 = require("../../../config/Client");
 var crypto_1 = __importDefault(require("crypto"));
 var token_func_1 = require("../func/token.func");
+var eventEmitter_1 = __importDefault(require("./../../../config/eventEmitter"));
 var Signup = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var data, response, token, error_1;
     return __generator(this, function (_a) {
@@ -99,9 +100,8 @@ var Login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
                 hexPass = crypto_1.default.createHash('md5').update(password).digest('hex');
                 varifiedPassword = hexPass === _user.password;
                 if (!varifiedPassword)
-                    return [2 /*return*/, res.status(401).json({ error: true, message: 'invalid password' })
-                        // generate Token
-                    ];
+                    return [2 /*return*/, res.status(401).json({ error: true, message: 'invalid password' })];
+                eventEmitter_1.default.emit('users:active', _user.id);
                 token = (0, token_func_1.CreateToken)({
                     payload: {
                         id: _user.id,

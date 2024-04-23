@@ -35,9 +35,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleViews = exports.handleUnlike = exports.handleLIke = exports.handleDeleteComment = exports.handleCommentCreate = exports.handlGetProfileBlogs = exports.handleDeleteBlog = exports.handleGetSingleBlog = exports.GetBlog = exports.CreateBlog = void 0;
 var blog_func_1 = require("../func/blog.func");
+var eventEmitter_1 = __importDefault(require("./../../../config/eventEmitter"));
 var CreateBlog = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var formdata, response, error_1;
     return __generator(this, function (_a) {
@@ -52,6 +56,7 @@ var CreateBlog = function (req, res) { return __awaiter(void 0, void 0, void 0, 
                 response = _a.sent();
                 if (!response)
                     return [2 /*return*/, res.status(400).json({ error: true, message: response })];
+                eventEmitter_1.default.emit('Blog:new');
                 res.status(200).json({ error: false, message: 'success', data: response });
                 return [3 /*break*/, 4];
             case 3:

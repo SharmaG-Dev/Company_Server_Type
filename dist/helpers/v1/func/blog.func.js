@@ -121,6 +121,9 @@ var GetBlogPost = function () { return __awaiter(void 0, void 0, void 0, functio
                                 }
                             }
                         }
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
                     }
                 })];
             case 1:

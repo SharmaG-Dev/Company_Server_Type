@@ -47,7 +47,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetProfiles = exports.DeactivateProfile = exports.UpdateUserProfile = exports.CreateProfile = void 0;
+exports.RemoveFriend = exports.AcceptFriendRequest = exports.CreateFriendRequest = exports.GetSingleprofile = exports.GetProfiles = exports.DeactivateProfile = exports.UpdateUserProfile = exports.CreateProfile = void 0;
 var Client_1 = require("../../../config/Client");
 function CreateProfile(input) {
     return __awaiter(this, void 0, void 0, function () {
@@ -125,6 +125,11 @@ function GetProfiles(params) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, Client_1.prisma.profile.findMany({
                         where: __assign({}, params),
+                        include: {
+                            friendRequestRecieved: true,
+                            friendRequestSent: true,
+                            friendsList: true
+                        }
                     })];
                 case 1:
                     _profiles = _a.sent();
@@ -134,3 +139,147 @@ function GetProfiles(params) {
     });
 }
 exports.GetProfiles = GetProfiles;
+function GetSingleprofile(profileId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var _profile;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, Client_1.prisma.profile.findUnique({
+                        where: {
+                            id: profileId
+                        },
+                        include: {
+                            friendRequestRecieved: true,
+                            friendRequestSent: true,
+                            friendsList: true,
+                        }
+                    })];
+                case 1:
+                    _profile = _a.sent();
+                    return [2 /*return*/, _profile];
+            }
+        });
+    });
+}
+exports.GetSingleprofile = GetSingleprofile;
+// Friends Request Api  
+function CreateFriendRequest(input) {
+    return __awaiter(this, void 0, void 0, function () {
+        var receiverId, senderId, response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    receiverId = input.receiverId, senderId = input.senderId;
+                    return [4 /*yield*/, Client_1.prisma.friendsRequest.create({
+                            data: {
+                                receiverId: receiverId,
+                                senderId: senderId
+                            }
+                        })];
+                case 1:
+                    response = _a.sent();
+                    return [2 /*return*/, response];
+            }
+        });
+    });
+}
+exports.CreateFriendRequest = CreateFriendRequest;
+function AcceptFriendRequest(input) {
+    return __awaiter(this, void 0, void 0, function () {
+        var id, senderId, receiverId, status_1, _updated, error_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 4, , 5]);
+                    id = input.id, senderId = input.senderId, receiverId = input.receiverId, status_1 = input.status;
+                    return [4 /*yield*/, Client_1.prisma.friendsRequest.update({
+                            where: {
+                                id: id,
+                            },
+                            data: {
+                                status: status_1,
+                            },
+                        })];
+                case 1:
+                    _updated = _a.sent();
+                    if (!_updated) {
+                        return [2 /*return*/, 'no request found '];
+                    }
+                    if (_updated.status === 'rejected') {
+                        return [2 /*return*/, _updated];
+                    }
+                    return [4 /*yield*/, Client_1.prisma.profile.update({
+                            where: {
+                                id: _updated.receiverId,
+                            },
+                            data: {
+                                friendId: senderId
+                            },
+                        })];
+                case 2:
+                    _a.sent();
+                    return [4 /*yield*/, Client_1.prisma.profile.update({
+                            where: {
+                                id: _updated.senderId,
+                            },
+                            data: {
+                                friendId: receiverId
+                            },
+                        })];
+                case 3:
+                    _a.sent();
+                    return [2 /*return*/, 'Friend request accepted successfully'];
+                case 4:
+                    error_1 = _a.sent();
+                    // Handle error
+                    console.error('Error accepting friend request:', error_1);
+                    throw new Error('Failed to accept friend request');
+                case 5: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.AcceptFriendRequest = AcceptFriendRequest;
+function RemoveFriend(input) {
+    return __awaiter(this, void 0, void 0, function () {
+        var userProfileId, profileId, _a, _userUpdate, secondUserUpdate;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    userProfileId = input.userProfileId, profileId = input.profileId;
+                    return [4 /*yield*/, Promise.all([
+                            Client_1.prisma.profile.update({
+                                where: {
+                                    id: profileId
+                                },
+                                data: {
+                                    friendsList: {
+                                        disconnect: {
+                                            id: userProfileId
+                                        }
+                                    }
+                                }
+                            }),
+                            Client_1.prisma.profile.update({
+                                where: {
+                                    id: userProfileId
+                                },
+                                data: {
+                                    friendsList: {
+                                        disconnect: {
+                                            id: profileId
+                                        }
+                                    }
+                                }
+                            })
+                        ])];
+                case 1:
+                    _a = _b.sent(), _userUpdate = _a[0], secondUserUpdate = _a[1];
+                    if (!_userUpdate && !secondUserUpdate)
+                        throw Error('failed to remove friend');
+                    return [2 /*return*/, 'successfully removed friend'];
+            }
+        });
+    });
+}
+exports.RemoveFriend = RemoveFriend;

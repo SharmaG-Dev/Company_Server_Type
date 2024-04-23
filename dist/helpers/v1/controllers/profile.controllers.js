@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateProfile = exports.GetAllProfile = void 0;
+exports.handleRemoveFriends = exports.handleFriendRequestAccept = exports.handleFriendRequestSent = exports.SingleProfileGet = exports.UpdateProfile = exports.GetAllProfile = void 0;
 var profile_func_1 = require("../func/profile.func");
 var GetAllProfile = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var params, response, error_1;
@@ -88,3 +88,119 @@ var UpdateProfile = function (req, res) { return __awaiter(void 0, void 0, void 
     });
 }); };
 exports.UpdateProfile = UpdateProfile;
+var SingleProfileGet = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var profileId, userData, _find, response, error_3;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                profileId = req.params.profileId;
+                userData = req.user;
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 3, , 4]);
+                _find = profileId;
+                if (!profileId) {
+                    _find = userData.profileId;
+                }
+                return [4 /*yield*/, (0, profile_func_1.GetSingleprofile)(_find)];
+            case 2:
+                response = _a.sent();
+                if (!response)
+                    return [2 /*return*/, res.status(400).json({ error: true, message: response })];
+                res.status(200).json({ error: false, message: 'success', data: response });
+                return [3 /*break*/, 4];
+            case 3:
+                error_3 = _a.sent();
+                res.status(500).json({ error: true, message: error_3 });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+exports.SingleProfileGet = SingleProfileGet;
+var handleFriendRequestSent = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var profileId, id, response, error_4;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                profileId = req.user.profileId;
+                id = req.params.profileId;
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 3, , 4]);
+                return [4 /*yield*/, (0, profile_func_1.CreateFriendRequest)({ receiverId: id, senderId: profileId })];
+            case 2:
+                response = _a.sent();
+                if (!response)
+                    return [2 /*return*/, res.status(400).json({ error: true, message: response })];
+                res.status(200).json({ error: false, message: 'success', data: response });
+                return [3 /*break*/, 4];
+            case 3:
+                error_4 = _a.sent();
+                res.status(500).json({ error: true, message: error_4 });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+exports.handleFriendRequestSent = handleFriendRequestSent;
+var handleFriendRequestAccept = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var profileId, _a, requestId, senderId, status, StatusType, response, error_5;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                profileId = req.user.profileId;
+                _a = req.params, requestId = _a.requestId, senderId = _a.senderId;
+                status = req.params.status;
+                if (status === 'true') {
+                    StatusType = 'accepted';
+                }
+                else {
+                    StatusType = 'rejected';
+                }
+                console.log(requestId, senderId, profileId, StatusType);
+                _b.label = 1;
+            case 1:
+                _b.trys.push([1, 3, , 4]);
+                return [4 /*yield*/, (0, profile_func_1.AcceptFriendRequest)({ id: requestId, senderId: senderId, receiverId: profileId, status: StatusType })];
+            case 2:
+                response = _b.sent();
+                if (!response)
+                    return [2 /*return*/, res.status(400).json({ error: true, message: response })];
+                res.status(200).json({ error: false, message: 'success', data: response });
+                return [3 /*break*/, 4];
+            case 3:
+                error_5 = _b.sent();
+                res.status(500).json({ error: true, message: error_5 });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+exports.handleFriendRequestAccept = handleFriendRequestAccept;
+var handleRemoveFriends = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var profileId, id, response, error_6;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                profileId = req.user.profileId;
+                id = req.params.profileId;
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 3, , 4]);
+                return [4 /*yield*/, (0, profile_func_1.RemoveFriend)({ profileId: id, userProfileId: profileId })];
+            case 2:
+                response = _a.sent();
+                if (!response)
+                    return [2 /*return*/, res.status(400).json({ error: true, message: response })];
+                res.status(200).json({ error: false, message: 'success', data: response });
+                return [3 /*break*/, 4];
+            case 3:
+                error_6 = _a.sent();
+                res.status(500).json({ error: true, message: error_6 });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+exports.handleRemoveFriends = handleRemoveFriends;
