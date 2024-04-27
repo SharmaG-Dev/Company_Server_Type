@@ -149,9 +149,17 @@ function GetSingleprofile(profileId) {
                             id: profileId
                         },
                         include: {
-                            friendRequestRecieved: true,
-                            friendRequestSent: true,
-                            friendsList: true,
+                            _count: {
+                                select: {
+                                    Views: {
+                                        where: {
+                                            isProfile: true
+                                        }
+                                    },
+                                    Blog: true,
+                                    friendsList: true
+                                }
+                            }
                         }
                     })];
                 case 1:

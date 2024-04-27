@@ -72,9 +72,17 @@ export async function GetSingleprofile(profileId: string) {
       id: profileId
     },
     include: {
-      friendRequestRecieved: true,
-      friendRequestSent: true,
-      friendsList: true,
+      _count: {
+        select: {
+          Views: {
+            where: {
+              isProfile: true
+            }
+          },
+          Blog: true,
+          friendsList: true
+        }
+      }
     }
   })
 

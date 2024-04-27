@@ -168,7 +168,43 @@ export const GetprofileBlogs = async ({ profileId }: { profileId: string }) => {
         where: { profileId: profileId }, include: {
             BlogTags: {
                 include: {
-                    tag: true
+                    tag: true,
+                }
+            },
+            comments: {
+                select: {
+                    comment: true,
+                    Profile: true,
+                    id: true,
+                    subComments: {
+                        skip: 0,
+                        take: 2,
+                        orderBy: {
+                            createdAt: 'asc',
+                        },
+                        include: {
+                            Profile: true,
+                            _count: {
+                                select: {
+                                    likes: true
+                                }
+                            }
+                        }
+                    },
+                    createdAt: true,
+                    updatedAt: true,
+                    _count: {
+                        select: {
+                            likes: true,
+                            subComments: true
+                        }
+                    }
+                },
+                where: {
+                    isSubComment: false,
+                },
+                orderBy: {
+                    createdAt: 'desc'
                 }
             },
             profile: true
