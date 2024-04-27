@@ -21,7 +21,7 @@ router.use(privateRoutes)
 
 privateRoutes.route('/get-all').get(GetAllProfile)
 privateRoutes.route('/update').patch(UpdateProfile)
-privateRoutes.route('/get-single-blog/:profileId').get(SingleProfileGet)
+privateRoutes.route('/get-single-profile/:profileId').get(SingleProfileGet)
 
 // friend Api 
 privateRoutes.route('/friend/send-request/:profileId').get(handleFriendRequestSent)
