@@ -41,3 +41,10 @@ export interface ViewsInput extends Partial<View> {
     profileId?: string
     userid: string
 }
+
+
+
+export interface SubCommentsGet {
+    blogId: string
+    commentId: string
+}

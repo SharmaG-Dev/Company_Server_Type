@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { BlogCreateDataType } from '../../../types/v1/blog';
-import { CreateBlogPost, CreateComment, DeleteBlog, DeleteComment, GetBlogPost, GetSingleBlog, GetprofileBlogs, RecordLikes, RemoveLike, ViewRegister } from '../func/blog.func';
+import { CreateBlogPost, CreateComment, DeleteBlog, DeleteComment, GetBlogPost, GetSingleBlog, GetSubComments, GetprofileBlogs, RecordLikes, RemoveLike, ViewRegister, fetchComments } from '../func/blog.func';
 import { customRequest } from '../../../types/v1/request';
 import { User } from '@prisma/client';
 import EventTracker from './../../../config/eventEmitter'
@@ -67,6 +67,8 @@ export const handlGetProfileBlogs = async (req: Request, res: Response) => {
 
 
 
+// Comments Api 
+
 
 export const handleCommentCreate = async (req: customRequest, res: Response) => {
     const { id } = req.params
@@ -93,6 +95,33 @@ export const handleDeleteComment = async (req: Request, res: Response) => {
     }
 }
 
+
+export const handleGetSubComments = async (req: Request, res: Response) => {
+    try {
+        const { blogId, commentId } = req.params
+        const _GetSubComments = await GetSubComments({ blogId: blogId, commentId: commentId })
+
+        if (!_GetSubComments) return res.status(400).json({ message: _GetSubComments })
+        res.status(200).json({ error: false, message: 'success', data: _GetSubComments })
+    } catch (error) {
+        res.status(500).json({ error: true, message: error })
+    }
+}
+
+
+export const handleGetComments = async (req: Request, res: Response) => {
+    try {
+        const { blogId } = req.params
+        const _comments = await fetchComments(blogId)
+        if (!_comments) return res.status(400).json({ error: true, message: _comments })
+        res.status(200).json({ error: false, message: 'success', data: _comments })
+    } catch (error) {
+        res.status(500).json({ error: true, message: error })
+    }
+}
+
+
+// Likes api
 
 
 export const handleLIke = async (req: customRequest, res: Response) => {

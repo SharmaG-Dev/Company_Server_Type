@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { genId, prisma } from '../../../config/Client';
-import { BlogCreateDataType, LikesInput, ViewsInput, commentInputs } from '../../../types/v1/blog';
+import { BlogCreateDataType, LikesInput, SubCommentsGet, ViewsInput, commentInputs } from '../../../types/v1/blog';
 
 
 
@@ -171,46 +171,70 @@ export const GetprofileBlogs = async ({ profileId }: { profileId: string }) => {
                     tag: true,
                 }
             },
-            comments: {
+            _count: {
                 select: {
-                    comment: true,
-                    Profile: true,
-                    id: true,
-                    subComments: {
-                        skip: 0,
-                        take: 2,
-                        orderBy: {
-                            createdAt: 'asc',
-                        },
-                        include: {
-                            Profile: true,
-                            _count: {
-                                select: {
-                                    likes: true
-                                }
-                            }
-                        }
-                    },
-                    createdAt: true,
-                    updatedAt: true,
-                    _count: {
-                        select: {
-                            likes: true,
-                            subComments: true
-                        }
-                    }
-                },
-                where: {
-                    isSubComment: false,
-                },
-                orderBy: {
-                    createdAt: 'desc'
+                    comments: true,
+                    Likes: true
                 }
             },
             profile: true
         }
     })
     return _blogs
+}
+
+
+export const fetchComments = async (blogId: string) => {
+    const _comments = await prisma.comments.findMany({
+        where: { blogId: blogId, isSubComment: false }, orderBy: {
+            createdAt: 'asc'
+        }, include: {
+            _count: {
+                select: {
+                    likes: true,
+                    subComments: true
+                }
+            },
+            Profile: true,
+            likes: {
+                select: {
+                    userId: true
+                }
+            }
+        }
+    })
+    return _comments
+}
+
+
+export const GetSubComments = async (Credentials: SubCommentsGet) => {
+    const { blogId, commentId } = Credentials
+
+    const subComments = await prisma.comments.findMany({
+        where: {
+            blogId: blogId,
+            commentId: commentId,
+            isSubComment: true
+        },
+        orderBy: {
+            createdAt: 'asc'
+        },
+        include: {
+            likes: {
+                select: {
+                    userId: true
+                }
+            },
+            Profile: true,
+            _count: {
+                select: {
+                    likes: true
+                }
+            }
+        }
+    })
+
+    return subComments
 }
 
 
