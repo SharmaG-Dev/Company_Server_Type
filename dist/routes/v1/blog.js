@@ -23,6 +23,8 @@ privateRoutes.route('/single-blog/:id').get(blog_controller_1.handleGetSingleBlo
 // comments api 
 privateRoutes.route('/comment/:id').post(blog_controller_1.handleCommentCreate);
 privateRoutes.route('/comment-delete/:commentId').delete(blog_controller_1.handleDeleteComment);
+privateRoutes.route('/comment/get/:blogId').get(blog_controller_1.handleGetComments);
+privateRoutes.route('/comment/get-sub/:blogId/:commentId').get(blog_controller_1.handleGetSubComments);
 // Likes Api 
 privateRoutes.route('/like').get(blog_controller_1.handleLIke);
 privateRoutes.route('/unlike').get(blog_controller_1.handleUnlike);

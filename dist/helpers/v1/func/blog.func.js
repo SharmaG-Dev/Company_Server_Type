@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ViewRegister = exports.RemoveLike = exports.RecordLikes = exports.DeleteComment = exports.CreateComment = exports.GetprofileBlogs = exports.DeleteBlog = exports.GetSingleBlog = exports.GetBlogPost = exports.CreateBlogPost = void 0;
+exports.ViewRegister = exports.RemoveLike = exports.RecordLikes = exports.DeleteComment = exports.CreateComment = exports.GetSubComments = exports.fetchComments = exports.GetprofileBlogs = exports.DeleteBlog = exports.GetSingleBlog = exports.GetBlogPost = exports.CreateBlogPost = void 0;
 var Client_1 = require("../../../config/Client");
 function CreateBlogPost(input) {
     return __awaiter(this, void 0, void 0, function () {
@@ -216,40 +216,10 @@ var GetprofileBlogs = function (_a) { return __awaiter(void 0, [_a], void 0, fun
                                 tag: true,
                             }
                         },
-                        comments: {
+                        _count: {
                             select: {
-                                comment: true,
-                                Profile: true,
-                                id: true,
-                                subComments: {
-                                    skip: 0,
-                                    take: 2,
-                                    orderBy: {
-                                        createdAt: 'asc',
-                                    },
-                                    include: {
-                                        Profile: true,
-                                        _count: {
-                                            select: {
-                                                likes: true
-                                            }
-                                        }
-                                    }
-                                },
-                                createdAt: true,
-                                updatedAt: true,
-                                _count: {
-                                    select: {
-                                        likes: true,
-                                        subComments: true
-                                    }
-                                }
-                            },
-                            where: {
-                                isSubComment: false,
-                            },
-                            orderBy: {
-                                createdAt: 'desc'
+                                comments: true,
+                                Likes: true
                             }
                         },
                         profile: true
@@ -262,6 +232,71 @@ var GetprofileBlogs = function (_a) { return __awaiter(void 0, [_a], void 0, fun
     });
 }); };
 exports.GetprofileBlogs = GetprofileBlogs;
+var fetchComments = function (blogId) { return __awaiter(void 0, void 0, void 0, function () {
+    var _comments;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, Client_1.prisma.comments.findMany({
+                    where: { blogId: blogId, isSubComment: false }, orderBy: {
+                        createdAt: 'asc'
+                    }, include: {
+                        _count: {
+                            select: {
+                                likes: true,
+                                subComments: true
+                            }
+                        },
+                        Profile: true,
+                        likes: {
+                            select: {
+                                userId: true
+                            }
+                        }
+                    }
+                })];
+            case 1:
+                _comments = _a.sent();
+                return [2 /*return*/, _comments];
+        }
+    });
+}); };
+exports.fetchComments = fetchComments;
+var GetSubComments = function (Credentials) { return __awaiter(void 0, void 0, void 0, function () {
+    var blogId, commentId, subComments;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                blogId = Credentials.blogId, commentId = Credentials.commentId;
+                return [4 /*yield*/, Client_1.prisma.comments.findMany({
+                        where: {
+                            blogId: blogId,
+                            commentId: commentId,
+                            isSubComment: true
+                        },
+                        orderBy: {
+                            createdAt: 'asc'
+                        },
+                        include: {
+                            likes: {
+                                select: {
+                                    userId: true
+                                }
+                            },
+                            Profile: true,
+                            _count: {
+                                select: {
+                                    likes: true
+                                }
+                            }
+                        }
+                    })];
+            case 1:
+                subComments = _a.sent();
+                return [2 /*return*/, subComments];
+        }
+    });
+}); };
+exports.GetSubComments = GetSubComments;
 var CreateComment = function (input) { return __awaiter(void 0, void 0, void 0, function () {
     var comment, profileId, commentId, blogId, isSubComment, _create;
     return __generator(this, function (_a) {
