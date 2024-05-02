@@ -174,7 +174,11 @@ export const GetprofileBlogs = async ({ profileId }: { profileId: string }) => {
             _count: {
                 select: {
                     comments: true,
-                    Likes: true
+                    Likes: {
+                        where: {
+                            isBlog: true
+                        }
+                    }
                 }
             },
             profile: true
@@ -282,6 +286,9 @@ export const RecordLikes = async (input: LikesInput) => {
     const isBlog = Boolean(blogId)
     const isComment = Boolean(commentsId)
 
+    const _findLike = await prisma.likes.findFirst({ where: { userId: userId, blogId: blogId, commentsId: commentsId } })
+
+    if (_findLike) return 'already liked'
     const _likes = await prisma.likes.create({
         data: {
             isBlog: isBlog,

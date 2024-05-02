@@ -219,7 +219,11 @@ var GetprofileBlogs = function (_a) { return __awaiter(void 0, [_a], void 0, fun
                         _count: {
                             select: {
                                 comments: true,
-                                Likes: true
+                                Likes: {
+                                    where: {
+                                        isBlog: true
+                                    }
+                                }
                             }
                         },
                         profile: true
@@ -338,13 +342,18 @@ var DeleteComment = function (commentId) { return __awaiter(void 0, void 0, void
 exports.DeleteComment = DeleteComment;
 // likes functions 
 var RecordLikes = function (input) { return __awaiter(void 0, void 0, void 0, function () {
-    var userId, blogId, commentsId, isBlog, isComment, _likes;
+    var userId, blogId, commentsId, isBlog, isComment, _findLike, _likes;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 userId = input.userId, blogId = input.blogId, commentsId = input.commentsId;
                 isBlog = Boolean(blogId);
                 isComment = Boolean(commentsId);
+                return [4 /*yield*/, Client_1.prisma.likes.findFirst({ where: { userId: userId, blogId: blogId, commentsId: commentsId } })];
+            case 1:
+                _findLike = _a.sent();
+                if (_findLike)
+                    return [2 /*return*/, 'already liked'];
                 return [4 /*yield*/, Client_1.prisma.likes.create({
                         data: {
                             isBlog: isBlog,
@@ -354,7 +363,7 @@ var RecordLikes = function (input) { return __awaiter(void 0, void 0, void 0, fu
                             blogId: blogId
                         },
                     })];
-            case 1:
+            case 2:
                 _likes = _a.sent();
                 return [2 /*return*/, _likes];
         }
