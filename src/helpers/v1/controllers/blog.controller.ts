@@ -140,12 +140,12 @@ export const handleLIke = async (req: customRequest, res: Response) => {
 
 
 export const handleUnlike = async (req: customRequest, res: Response) => {
-    const { commentsId, blogId } = req.query as { commentsId?: string, blogId?: string }
+    const { commentId, blogId } = req.query as { commentId?: string, blogId?: string }
     const { id } = req.user as User
     try {
 
-        if (!commentsId && !blogId) return res.status(401).json({ error: true, message: 'provide the commentId or blogId' })
-        const response = await RemoveLike({ userId: id, commentsId, blogId })
+        if (!commentId && !blogId) return res.status(401).json({ error: true, message: 'provide the commentId or blogId' })
+        const response = await RemoveLike({ userId: id, commentsId: commentId, blogId })
 
         res.status(200).json({ error: false, message: 'success', data: response })
     } catch (error) {

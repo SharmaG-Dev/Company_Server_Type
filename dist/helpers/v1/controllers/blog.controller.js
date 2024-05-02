@@ -284,18 +284,18 @@ var handleLIke = function (req, res) { return __awaiter(void 0, void 0, void 0, 
 }); };
 exports.handleLIke = handleLIke;
 var handleUnlike = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, commentsId, blogId, id, response, error_11;
+    var _a, commentId, blogId, id, response, error_11;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _a = req.query, commentsId = _a.commentsId, blogId = _a.blogId;
+                _a = req.query, commentId = _a.commentId, blogId = _a.blogId;
                 id = req.user.id;
                 _b.label = 1;
             case 1:
                 _b.trys.push([1, 3, , 4]);
-                if (!commentsId && !blogId)
+                if (!commentId && !blogId)
                     return [2 /*return*/, res.status(401).json({ error: true, message: 'provide the commentId or blogId' })];
-                return [4 /*yield*/, (0, blog_func_1.RemoveLike)({ userId: id, commentsId: commentsId, blogId: blogId })];
+                return [4 /*yield*/, (0, blog_func_1.RemoveLike)({ userId: id, commentsId: commentId, blogId: blogId })];
             case 2:
                 response = _b.sent();
                 res.status(200).json({ error: false, message: 'success', data: response });
