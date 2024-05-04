@@ -16,7 +16,7 @@ router.use(privateRoutes)
 router.use(publicRoutes)
 
 privateRoutes.route('/create').post(ValidateWithSchema(BlogCreateValidateschema, validateBody), CreateBlog)
-privateRoutes.route('/get').get(ValidateWithSchema(BlogGetValidatesSchema, validateQuery), GetBlog)
+publicRoutes.route('/get').get(ValidateWithSchema(BlogGetValidatesSchema, validateQuery), GetBlog)
 privateRoutes.route('/delete').delete(ValidateWithSchema(BlogDeleteSchema, validateQuery), handleDeleteBlog)
 privateRoutes.route('/profile-blogs/:profileId').get(handlGetProfileBlogs)
 privateRoutes.route('/single-blog/:id').get(handleGetSingleBlog)

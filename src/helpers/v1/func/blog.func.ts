@@ -59,35 +59,29 @@ export const GetBlogPost = async () => {
     const _blogs = await prisma.blog.findMany({
         include: {
             BlogTags: {
+                include: {
+                    tag: true,
+                }
+            },
+            Likes: {
                 select: {
-                    tag: {
-                        select: {
-                            id: true,
-                            title: true
+                    userId: true
+                },
+                where: {
+                    isComment: false
+                }
+            },
+            _count: {
+                select: {
+                    comments: true,
+                    Likes: {
+                        where: {
+                            isComment: false,
                         }
                     }
                 }
             },
-            profile: {
-                select: {
-                    id: true,
-                    name: true,
-                    avatar: true,
-                },
-            },
-            _count: {
-                select: {
-                    comments: {
-                        where: { isSubComment: false }
-                    },
-                    Likes: {
-                        where: { isBlog: true }
-                    },
-                    Views: {
-                        where: { isBlog: true }
-                    }
-                }
-            }
+            profile: true
         },
         orderBy: {
             createdAt: 'desc'
@@ -141,10 +135,6 @@ export const GetSingleBlog = async (blogId: string) => {
 }
 
 
-
-
-
-
 export const DeleteBlog = async ({ id }: { id?: string }) => {
     const _blog: any = {}
     const _blogtags: any = {}
@@ -171,12 +161,20 @@ export const GetprofileBlogs = async ({ profileId }: { profileId: string }) => {
                     tag: true,
                 }
             },
+            Likes: {
+                select: {
+                    userId: true
+                },
+                where: {
+                    isComment: false
+                }
+            },
             _count: {
                 select: {
                     comments: true,
                     Likes: {
                         where: {
-                            isBlog: true
+                            isComment: false,
                         }
                     }
                 }
@@ -286,7 +284,7 @@ export const RecordLikes = async (input: LikesInput) => {
     const isBlog = Boolean(blogId)
     const isComment = Boolean(commentsId)
 
-    const _findLike = await prisma.likes.findFirst({ where: { userId: userId, blogId: blogId, commentsId: commentsId } })
+    const _findLike = await prisma.likes.findFirst({ where: { userId: userId, blogId: blogId, commentsId: commentsId, isBlog: isBlog, isComment: isComment } })
 
     if (_findLike) return 'already liked'
     const _likes = await prisma.likes.create({
@@ -309,11 +307,14 @@ export const RemoveLike = async (input: LikesInput) => {
 
     const { userId, blogId, commentsId } = input
 
+    const isComment = Boolean(commentsId)
+
     const _deletedLike = await prisma.likes.deleteMany({
         where: {
             userId: userId,
             blogId: blogId,
-            commentsId: commentsId
+            commentsId: commentsId,
+            isComment: isComment
         }
     })
 

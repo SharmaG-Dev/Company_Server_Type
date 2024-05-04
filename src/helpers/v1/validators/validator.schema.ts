@@ -66,7 +66,7 @@ export const BlogCreateValidateschema = joi.object({
 })
 
 export const BlogGetValidatesSchema = joi.object({
-    id: joi.string().uuid()
+    tagId: joi.array()
 })
 export const BlogDeleteSchema = joi.object({
     id: joi.string().uuid()

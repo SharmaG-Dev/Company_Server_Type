@@ -92,35 +92,29 @@ var GetBlogPost = function () { return __awaiter(void 0, void 0, void 0, functio
             case 0: return [4 /*yield*/, Client_1.prisma.blog.findMany({
                     include: {
                         BlogTags: {
+                            include: {
+                                tag: true,
+                            }
+                        },
+                        Likes: {
                             select: {
-                                tag: {
-                                    select: {
-                                        id: true,
-                                        title: true
+                                userId: true
+                            },
+                            where: {
+                                isComment: false
+                            }
+                        },
+                        _count: {
+                            select: {
+                                comments: true,
+                                Likes: {
+                                    where: {
+                                        isComment: false,
                                     }
                                 }
                             }
                         },
-                        profile: {
-                            select: {
-                                id: true,
-                                name: true,
-                                avatar: true,
-                            },
-                        },
-                        _count: {
-                            select: {
-                                comments: {
-                                    where: { isSubComment: false }
-                                },
-                                Likes: {
-                                    where: { isBlog: true }
-                                },
-                                Views: {
-                                    where: { isBlog: true }
-                                }
-                            }
-                        }
+                        profile: true
                     },
                     orderBy: {
                         createdAt: 'desc'
@@ -216,12 +210,20 @@ var GetprofileBlogs = function (_a) { return __awaiter(void 0, [_a], void 0, fun
                                 tag: true,
                             }
                         },
+                        Likes: {
+                            select: {
+                                userId: true
+                            },
+                            where: {
+                                isComment: false
+                            }
+                        },
                         _count: {
                             select: {
                                 comments: true,
                                 Likes: {
                                     where: {
-                                        isBlog: true
+                                        isComment: false,
                                     }
                                 }
                             }
@@ -349,7 +351,7 @@ var RecordLikes = function (input) { return __awaiter(void 0, void 0, void 0, fu
                 userId = input.userId, blogId = input.blogId, commentsId = input.commentsId;
                 isBlog = Boolean(blogId);
                 isComment = Boolean(commentsId);
-                return [4 /*yield*/, Client_1.prisma.likes.findFirst({ where: { userId: userId, blogId: blogId, commentsId: commentsId } })];
+                return [4 /*yield*/, Client_1.prisma.likes.findFirst({ where: { userId: userId, blogId: blogId, commentsId: commentsId, isBlog: isBlog, isComment: isComment } })];
             case 1:
                 _findLike = _a.sent();
                 if (_findLike)
@@ -371,16 +373,18 @@ var RecordLikes = function (input) { return __awaiter(void 0, void 0, void 0, fu
 }); };
 exports.RecordLikes = RecordLikes;
 var RemoveLike = function (input) { return __awaiter(void 0, void 0, void 0, function () {
-    var userId, blogId, commentsId, _deletedLike;
+    var userId, blogId, commentsId, isComment, _deletedLike;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 userId = input.userId, blogId = input.blogId, commentsId = input.commentsId;
+                isComment = Boolean(commentsId);
                 return [4 /*yield*/, Client_1.prisma.likes.deleteMany({
                         where: {
                             userId: userId,
                             blogId: blogId,
-                            commentsId: commentsId
+                            commentsId: commentsId,
+                            isComment: isComment
                         }
                     })];
             case 1:

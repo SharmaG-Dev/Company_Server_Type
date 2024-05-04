@@ -16,7 +16,7 @@ privateRoutes.use(auth_m_1.Authorization);
 router.use(privateRoutes);
 router.use(publicRoutes);
 privateRoutes.route('/create').post((0, validators_1.ValidateWithSchema)(validator_schema_1.BlogCreateValidateschema, validator_func_1.validateBody), blog_controller_1.CreateBlog);
-privateRoutes.route('/get').get((0, validators_1.ValidateWithSchema)(validator_schema_1.BlogGetValidatesSchema, validator_func_1.validateQuery), blog_controller_1.GetBlog);
+publicRoutes.route('/get').get((0, validators_1.ValidateWithSchema)(validator_schema_1.BlogGetValidatesSchema, validator_func_1.validateQuery), blog_controller_1.GetBlog);
 privateRoutes.route('/delete').delete((0, validators_1.ValidateWithSchema)(validator_schema_1.BlogDeleteSchema, validator_func_1.validateQuery), blog_controller_1.handleDeleteBlog);
 privateRoutes.route('/profile-blogs/:profileId').get(blog_controller_1.handlGetProfileBlogs);
 privateRoutes.route('/single-blog/:id').get(blog_controller_1.handleGetSingleBlog);

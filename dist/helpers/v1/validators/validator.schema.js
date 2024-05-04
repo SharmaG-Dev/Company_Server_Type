@@ -47,7 +47,7 @@ exports.BlogCreateValidateschema = joi_1.default.object({
     profileId: joi_1.default.string().required()
 });
 exports.BlogGetValidatesSchema = joi_1.default.object({
-    id: joi_1.default.string().uuid()
+    tagId: joi_1.default.array()
 });
 exports.BlogDeleteSchema = joi_1.default.object({
     id: joi_1.default.string().uuid()
