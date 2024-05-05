@@ -42,6 +42,7 @@ exports.BlogCreateValidateschema = joi_1.default.object({
     title: joi_1.default.string().required().min(1),
     images: joi_1.default.array().required().min(1),
     sortDisc: joi_1.default.string().required().min(1),
+    isQuerry: joi_1.default.boolean().required(),
     longDisc: joi_1.default.string().required().min(1),
     BlogTags: joi_1.default.array().required().min(1),
     profileId: joi_1.default.string().required()

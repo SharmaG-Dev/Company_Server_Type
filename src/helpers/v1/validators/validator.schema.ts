@@ -59,6 +59,7 @@ export const BlogCreateValidateschema = joi.object({
     title: joi.string().required().min(1),
     images: joi.array().required().min(1),
     sortDisc: joi.string().required().min(1),
+    isQuerry: joi.boolean().required(),
     longDisc: joi.string().required().min(1),
     BlogTags: joi.array().required().min(1),
     profileId: joi.string().required()

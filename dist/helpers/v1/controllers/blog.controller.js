@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleViews = exports.handleUnlike = exports.handleLIke = exports.handleGetComments = exports.handleGetSubComments = exports.handleDeleteComment = exports.handleCommentCreate = exports.handlGetProfileBlogs = exports.handleDeleteBlog = exports.handleGetSingleBlog = exports.GetBlog = exports.CreateBlog = void 0;
+exports.handleViews = exports.handleUnlike = exports.handleLIke = exports.handleGetComments = exports.handleGetSubComments = exports.handleDeleteComment = exports.handleCommentCreate = exports.handlGetProfileBlogs = exports.handleDeleteBlog = exports.handleGetAllQuery = exports.handleGetSingleBlog = exports.GetBlog = exports.CreateBlog = void 0;
 var blog_func_1 = require("../func/blog.func");
 var eventEmitter_1 = __importDefault(require("./../../../config/eventEmitter"));
 var CreateBlog = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
@@ -113,8 +113,30 @@ var handleGetSingleBlog = function (req, res) { return __awaiter(void 0, void 0,
     });
 }); };
 exports.handleGetSingleBlog = handleGetSingleBlog;
+var handleGetAllQuery = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var response, error_4;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, (0, blog_func_1.getAllQueries)()];
+            case 1:
+                response = _a.sent();
+                if (!response)
+                    return [2 /*return*/, res.status(400).json({ error: true, message: response })];
+                res.status(200).json({ error: false, message: 'success', data: response });
+                return [3 /*break*/, 3];
+            case 2:
+                error_4 = _a.sent();
+                res.status(500).json({ error: true, message: error_4 });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
+exports.handleGetAllQuery = handleGetAllQuery;
 var handleDeleteBlog = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var id, response, error_4;
+    var id, response, error_5;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -128,8 +150,8 @@ var handleDeleteBlog = function (req, res) { return __awaiter(void 0, void 0, vo
                 res.status(200).json({ error: false, message: 'success', data: response });
                 return [3 /*break*/, 4];
             case 3:
-                error_4 = _a.sent();
-                res.status(500).json({ error: true, message: error_4 });
+                error_5 = _a.sent();
+                res.status(500).json({ error: true, message: error_5 });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
@@ -137,7 +159,7 @@ var handleDeleteBlog = function (req, res) { return __awaiter(void 0, void 0, vo
 }); };
 exports.handleDeleteBlog = handleDeleteBlog;
 var handlGetProfileBlogs = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var profileId, response, error_5;
+    var profileId, response, error_6;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -151,8 +173,8 @@ var handlGetProfileBlogs = function (req, res) { return __awaiter(void 0, void 0
                 res.status(200).json({ error: false, message: 'success', data: response });
                 return [3 /*break*/, 4];
             case 3:
-                error_5 = _a.sent();
-                res.status(500).json({ error: true, message: error_5 });
+                error_6 = _a.sent();
+                res.status(500).json({ error: true, message: error_6 });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
@@ -161,7 +183,7 @@ var handlGetProfileBlogs = function (req, res) { return __awaiter(void 0, void 0
 exports.handlGetProfileBlogs = handlGetProfileBlogs;
 // Comments Api 
 var handleCommentCreate = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var id, _a, comment, commentId, profileId, response, error_6;
+    var id, _a, comment, commentId, profileId, response, error_7;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -179,8 +201,8 @@ var handleCommentCreate = function (req, res) { return __awaiter(void 0, void 0,
                 res.status(200).json({ error: false, message: 'success', data: response });
                 return [3 /*break*/, 4];
             case 3:
-                error_6 = _b.sent();
-                res.status(500).json({ error: true, message: error_6 });
+                error_7 = _b.sent();
+                res.status(500).json({ error: true, message: error_7 });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
@@ -188,7 +210,7 @@ var handleCommentCreate = function (req, res) { return __awaiter(void 0, void 0,
 }); };
 exports.handleCommentCreate = handleCommentCreate;
 var handleDeleteComment = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var commentId, response, error_7;
+    var commentId, response, error_8;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -202,8 +224,8 @@ var handleDeleteComment = function (req, res) { return __awaiter(void 0, void 0,
                 res.status(200).json({ error: false, message: 'success', data: response });
                 return [3 /*break*/, 4];
             case 3:
-                error_7 = _a.sent();
-                res.status(500).json({ error: true, message: error_7 });
+                error_8 = _a.sent();
+                res.status(500).json({ error: true, message: error_8 });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
@@ -211,7 +233,7 @@ var handleDeleteComment = function (req, res) { return __awaiter(void 0, void 0,
 }); };
 exports.handleDeleteComment = handleDeleteComment;
 var handleGetSubComments = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, blogId, commentId, _GetSubComments, error_8;
+    var _a, blogId, commentId, _GetSubComments, error_9;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -225,8 +247,8 @@ var handleGetSubComments = function (req, res) { return __awaiter(void 0, void 0
                 res.status(200).json({ error: false, message: 'success', data: _GetSubComments });
                 return [3 /*break*/, 3];
             case 2:
-                error_8 = _b.sent();
-                res.status(500).json({ error: true, message: error_8 });
+                error_9 = _b.sent();
+                res.status(500).json({ error: true, message: error_9 });
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
@@ -234,7 +256,7 @@ var handleGetSubComments = function (req, res) { return __awaiter(void 0, void 0
 }); };
 exports.handleGetSubComments = handleGetSubComments;
 var handleGetComments = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var blogId, _comments, error_9;
+    var blogId, _comments, error_10;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -248,8 +270,8 @@ var handleGetComments = function (req, res) { return __awaiter(void 0, void 0, v
                 res.status(200).json({ error: false, message: 'success', data: _comments });
                 return [3 /*break*/, 3];
             case 2:
-                error_9 = _a.sent();
-                res.status(500).json({ error: true, message: error_9 });
+                error_10 = _a.sent();
+                res.status(500).json({ error: true, message: error_10 });
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
@@ -258,7 +280,7 @@ var handleGetComments = function (req, res) { return __awaiter(void 0, void 0, v
 exports.handleGetComments = handleGetComments;
 // Likes api
 var handleLIke = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, blogId, commentId, id, resposne, error_10;
+    var _a, blogId, commentId, id, resposne, error_11;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -275,8 +297,8 @@ var handleLIke = function (req, res) { return __awaiter(void 0, void 0, void 0, 
                 res.status(200).json({ error: false, message: 'success', data: resposne });
                 return [3 /*break*/, 4];
             case 3:
-                error_10 = _b.sent();
-                res.status(500).json({ error: true, message: error_10 });
+                error_11 = _b.sent();
+                res.status(500).json({ error: true, message: error_11 });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
@@ -284,7 +306,7 @@ var handleLIke = function (req, res) { return __awaiter(void 0, void 0, void 0, 
 }); };
 exports.handleLIke = handleLIke;
 var handleUnlike = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, commentId, blogId, id, response, error_11;
+    var _a, commentId, blogId, id, response, error_12;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -301,8 +323,8 @@ var handleUnlike = function (req, res) { return __awaiter(void 0, void 0, void 0
                 res.status(200).json({ error: false, message: 'success', data: response });
                 return [3 /*break*/, 4];
             case 3:
-                error_11 = _b.sent();
-                res.status(500).json({ error: true, message: error_11 });
+                error_12 = _b.sent();
+                res.status(500).json({ error: true, message: error_12 });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
@@ -311,7 +333,7 @@ var handleUnlike = function (req, res) { return __awaiter(void 0, void 0, void 0
 exports.handleUnlike = handleUnlike;
 // views Api 
 var handleViews = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, profileId, blogId, id, response, error_12;
+    var _a, profileId, blogId, id, response, error_13;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -328,8 +350,8 @@ var handleViews = function (req, res) { return __awaiter(void 0, void 0, void 0,
                 res.status(200).json({ error: false, message: 'success', data: response });
                 return [3 /*break*/, 4];
             case 3:
-                error_12 = _b.sent();
-                res.status(500).json({ error: true, message: error_12 });
+                error_13 = _b.sent();
+                res.status(500).json({ error: true, message: error_13 });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }

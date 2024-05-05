@@ -29,24 +29,26 @@ model User {
 }
 
 model Profile {
-  id                    String           @id @db.VarChar(64)
-  name                  String           @db.VarChar(100)
-  avatar                String?          @db.VarChar(200)
-  email                 String           @db.VarChar(120)
-  active                Boolean          @default(true)
-  googleId              String?          @db.VarChar(200)
-  createdAt             DateTime         @default(now())
-  updateAt              DateTime         @updatedAt
-  friendId              String?          @db.VarChar(36)
-  profile               Profile?         @relation("Friends", fields: [friendId], references: [id])
-  friendsList           Profile[]        @relation("Friends")
+  id                    String             @id @db.VarChar(64)
+  name                  String             @db.VarChar(100)
+  avatar                String?            @db.VarChar(200)
+  email                 String             @db.VarChar(120)
+  active                Boolean            @default(true)
+  googleId              String?            @db.VarChar(200)
+  createdAt             DateTime           @default(now())
+  updateAt              DateTime           @updatedAt
+  friendId              String?            @db.VarChar(36)
+  profile               Profile?           @relation("Friends", fields: [friendId], references: [id])
+  friendsList           Profile[]          @relation("Friends")
   comments              Comments[]
   User                  User[]
   tags                  Tags[]
   Blog                  Blog[]
   Views                 View[]
-  friendRequestSent     FriendsRequest[] @relation("friendRequestSent")
-  friendRequestRecieved FriendsRequest[] @relation("friendRequestRecieved")
+  friendRequestSent     FriendsRequest[]   @relation("friendRequestSent")
+  friendRequestRecieved FriendsRequest[]   @relation("friendRequestRecieved")
+  RoomParticipants      RoomParticipants[]
+  ReadMesseges          ReadMesseges[]
 
   @@map("profile")
 }
@@ -69,19 +71,22 @@ model FriendsRequest {
 }
 
 model Blog {
-  id        String     @id @db.VarChar(36)
-  title     String     @db.VarChar(180)
-  sortDisc  String     @db.VarChar(180)
-  images    String[]
-  longDisc  String     @db.VarChar(8000)
-  BlogTags  BlogTags[]
-  profile   Profile    @relation(fields: [profileId], references: [id])
-  createdAt DateTime   @default(now())
-  updateAt  DateTime   @updatedAt
-  profileId String     @db.VarChar(64)
-  comments  Comments[]
-  Likes     Likes[]
-  Views     View[]
+  id         String      @id @db.VarChar(36)
+  title      String      @db.VarChar(180)
+  sortDisc   String      @db.VarChar(180)
+  images     String[]
+  isQuerry   Boolean     @default(false)
+  isResolved Boolean?
+  longDisc   String      @db.VarChar(8000)
+  BlogTags   BlogTags[]
+  profile    Profile     @relation(fields: [profileId], references: [id])
+  createdAt  DateTime    @default(now())
+  updateAt   DateTime    @updatedAt
+  profileId  String      @db.VarChar(64)
+  comments   Comments[]
+  Likes      Likes[]
+  Views      View[]
+  QueryRoom  QueryRoom[]
 
   @@map("blogs")
 }
@@ -172,4 +177,62 @@ model Admin {
   updatedAt DateTime @updatedAt
 
   @@map("admin")
+}
+
+// Querry resolver room 
+enum QuerryStatus {
+  solved
+  progress
+}
+
+model QueryRoom {
+  id               String             @id @default(uuid())
+  hashtag          String             @unique
+  messages         RoomMessages[]
+  RoomParticipants RoomParticipants[]
+  QueryBlog        Blog               @relation(fields: [QueryBlogId], references: [id])
+  QueryBlogId      String             @db.VarChar(36)
+  status           QuerryStatus       @default(progress)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@map("query_rooms")
+}
+
+model RoomMessages {
+  id           String         @id @default(uuid())
+  message      String         @db.VarChar(900)
+  images       String[]       @db.VarChar(120)
+  file         String[]       @db.VarChar(120)
+  createdAt    DateTime       @default(now())
+  replyId      String         @db.VarChar(36)
+  replyOf      RoomMessages   @relation("reply", fields: [replyId], references: [id])
+  repliedTo    RoomMessages[] @relation("reply")
+  updatedAt    DateTime       @updatedAt
+  QueryRoom    QueryRoom?     @relation(fields: [queryRoomId], references: [id])
+  queryRoomId  String?
+  ReadMesseges ReadMesseges[]
+}
+
+model ReadMesseges {
+  profile   Profile      @relation(fields: [profileId], references: [id])
+  profileId String       @db.VarChar(36)
+  messageId String       @db.VarChar(36)
+  message   RoomMessages @relation(fields: [messageId], references: [id])
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@id([profileId, messageId])
+  @@map("readed_message")
+}
+
+model RoomParticipants {
+  profileId String    @db.VarChar(36)
+  profile   Profile   @relation(fields: [profileId], references: [id])
+  Roomid    String    @db.VarChar(36)
+  Room      QueryRoom @relation(fields: [Roomid], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@id([profileId, Roomid])
 }

@@ -12,7 +12,11 @@ const app = express()
 
 const port: number = parseInt(process.env.PORT || '5000', 10)
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: true
+  }
+});
 const upload = multer().any()
 
 app.use(upload)

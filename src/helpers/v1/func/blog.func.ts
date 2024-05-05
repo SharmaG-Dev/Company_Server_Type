@@ -24,6 +24,7 @@ export async function CreateBlogPost(input: BlogCreateDataType) {
         id: blogId,
         title: input.title,
         images: input.images,
+        isQuerry: input.isQuerry,
         longDisc: input.longDisc,
         profile: {
             connect: {
@@ -144,6 +145,11 @@ export const DeleteBlog = async ({ id }: { id?: string }) => {
         _blogtags.where = { blogId: id }
     }
     await prisma.blogTags.deleteMany(_blogtags)
+    await prisma.comments.deleteMany({
+        where: {
+            blogId: id
+        }
+    })
     const _delete = await prisma.blog.deleteMany(_blog)
 
     return _delete
@@ -184,6 +190,52 @@ export const GetprofileBlogs = async ({ profileId }: { profileId: string }) => {
     })
     return _blogs
 }
+
+// fetch the queries only 
+
+export const getAllQueries = async () => {
+    const response = await prisma.blog.findMany({
+        where: {
+            isQuerry: true
+        },
+        include: {
+            BlogTags: {
+                include: {
+                    tag: true,
+                }
+            },
+            Likes: {
+                select: {
+                    userId: true
+                },
+                where: {
+                    isComment: false
+                }
+            },
+            _count: {
+                select: {
+                    comments: true,
+                    Likes: {
+                        where: {
+                            isComment: false,
+                        }
+                    }
+                }
+            },
+            profile: true
+        },
+        orderBy: {
+            createdAt: 'desc'
+        }
+    })
+    return response
+}
+
+
+
+// Comments 
+
+
 
 
 export const fetchComments = async (blogId: string) => {

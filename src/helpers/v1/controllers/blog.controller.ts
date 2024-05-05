@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { BlogCreateDataType } from '../../../types/v1/blog';
-import { CreateBlogPost, CreateComment, DeleteBlog, DeleteComment, GetBlogPost, GetSingleBlog, GetSubComments, GetprofileBlogs, RecordLikes, RemoveLike, ViewRegister, fetchComments } from '../func/blog.func';
+import { CreateBlogPost, CreateComment, DeleteBlog, DeleteComment, GetBlogPost, GetSingleBlog, GetSubComments, GetprofileBlogs, RecordLikes, RemoveLike, ViewRegister, fetchComments, getAllQueries } from '../func/blog.func';
 import { customRequest } from '../../../types/v1/request';
 import { User } from '@prisma/client';
 import EventTracker from './../../../config/eventEmitter'
@@ -35,6 +35,17 @@ export const handleGetSingleBlog = async (req: Request, res: Response) => {
     const id = req.params.id as string
     try {
         const response = await GetSingleBlog(id)
+        if (!response) return res.status(400).json({ error: true, message: response })
+        res.status(200).json({ error: false, message: 'success', data: response })
+    } catch (error) {
+        res.status(500).json({ error: true, message: error })
+    }
+}
+
+
+export const handleGetAllQuery = async (req: Request, res: Response) => {
+    try {
+        const response = await getAllQueries()
         if (!response) return res.status(400).json({ error: true, message: response })
         res.status(200).json({ error: false, message: 'success', data: response })
     } catch (error) {

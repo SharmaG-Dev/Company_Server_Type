@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ViewRegister = exports.RemoveLike = exports.RecordLikes = exports.DeleteComment = exports.CreateComment = exports.GetSubComments = exports.fetchComments = exports.GetprofileBlogs = exports.DeleteBlog = exports.GetSingleBlog = exports.GetBlogPost = exports.CreateBlogPost = void 0;
+exports.ViewRegister = exports.RemoveLike = exports.RecordLikes = exports.DeleteComment = exports.CreateComment = exports.GetSubComments = exports.fetchComments = exports.getAllQueries = exports.GetprofileBlogs = exports.DeleteBlog = exports.GetSingleBlog = exports.GetBlogPost = exports.CreateBlogPost = void 0;
 var Client_1 = require("../../../config/Client");
 function CreateBlogPost(input) {
     return __awaiter(this, void 0, void 0, function () {
@@ -56,6 +56,7 @@ function CreateBlogPost(input) {
                         id: blogId,
                         title: input.title,
                         images: input.images,
+                        isQuerry: input.isQuerry,
                         longDisc: input.longDisc,
                         profile: {
                             connect: {
@@ -190,8 +191,15 @@ var DeleteBlog = function (_a) { return __awaiter(void 0, [_a], void 0, function
                 return [4 /*yield*/, Client_1.prisma.blogTags.deleteMany(_blogtags)];
             case 1:
                 _c.sent();
-                return [4 /*yield*/, Client_1.prisma.blog.deleteMany(_blog)];
+                return [4 /*yield*/, Client_1.prisma.comments.deleteMany({
+                        where: {
+                            blogId: id
+                        }
+                    })];
             case 2:
+                _c.sent();
+                return [4 /*yield*/, Client_1.prisma.blog.deleteMany(_blog)];
+            case 3:
                 _delete = _c.sent();
                 return [2 /*return*/, _delete];
         }
@@ -238,6 +246,53 @@ var GetprofileBlogs = function (_a) { return __awaiter(void 0, [_a], void 0, fun
     });
 }); };
 exports.GetprofileBlogs = GetprofileBlogs;
+// fetch the queries only 
+var getAllQueries = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var response;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, Client_1.prisma.blog.findMany({
+                    where: {
+                        isQuerry: true
+                    },
+                    include: {
+                        BlogTags: {
+                            include: {
+                                tag: true,
+                            }
+                        },
+                        Likes: {
+                            select: {
+                                userId: true
+                            },
+                            where: {
+                                isComment: false
+                            }
+                        },
+                        _count: {
+                            select: {
+                                comments: true,
+                                Likes: {
+                                    where: {
+                                        isComment: false,
+                                    }
+                                }
+                            }
+                        },
+                        profile: true
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                })];
+            case 1:
+                response = _a.sent();
+                return [2 /*return*/, response];
+        }
+    });
+}); };
+exports.getAllQueries = getAllQueries;
+// Comments 
 var fetchComments = function (blogId) { return __awaiter(void 0, void 0, void 0, function () {
     var _comments;
     return __generator(this, function (_a) {

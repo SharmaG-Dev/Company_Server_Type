@@ -14,7 +14,11 @@ var socket_1 = require("./helpers/v1/services/socket");
 var app = (0, express_1.default)();
 var port = parseInt(process.env.PORT || '5000', 10);
 var server = (0, node_http_1.createServer)(app);
-var io = new socket_io_1.Server(server);
+var io = new socket_io_1.Server(server, {
+    cors: {
+        origin: true
+    }
+});
 var upload = (0, multer_1.default)().any();
 app.use(upload);
 app.use(express_1.default.json());
