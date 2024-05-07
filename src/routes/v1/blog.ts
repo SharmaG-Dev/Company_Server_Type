@@ -1,5 +1,5 @@
 import express from 'express'
-import { CreateBlog, GetBlog, handlGetProfileBlogs, handleCommentCreate, handleDeleteBlog, handleDeleteComment, handleGetComments, handleGetSingleBlog, handleGetSubComments, handleLIke, handleUnlike, handleViews } from '../../helpers/v1/controllers/blog.controller'
+import { CreateBlog, GetBlog, handlGetProfileBlogs, handleCommentCreate, handleDeleteBlog, handleDeleteComment, handleGetAllQuery, handleGetComments, handleGetSingleBlog, handleGetSubComments, handleLIke, handleUnlike, handleViews } from '../../helpers/v1/controllers/blog.controller'
 import { Authorization } from '../../helpers/v1/middlewares/auth.m'
 import { ValidateWithSchema } from '../../config/validators'
 import { BlogCreateValidateschema, BlogDeleteSchema, BlogGetValidatesSchema } from '../../helpers/v1/validators/validator.schema'
@@ -20,7 +20,7 @@ publicRoutes.route('/get').get(ValidateWithSchema(BlogGetValidatesSchema, valida
 privateRoutes.route('/delete').delete(ValidateWithSchema(BlogDeleteSchema, validateQuery), handleDeleteBlog)
 privateRoutes.route('/profile-blogs/:profileId').get(handlGetProfileBlogs)
 privateRoutes.route('/single-blog/:id').get(handleGetSingleBlog)
-
+privateRoutes.route('/queries').get(handleGetAllQuery)
 
 // comments api 
 privateRoutes.route('/comment/:id').post(handleCommentCreate)
