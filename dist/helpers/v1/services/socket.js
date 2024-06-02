@@ -35,53 +35,158 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HandleUserCounts = exports.handleSocket = void 0;
+exports.handleSocket = void 0;
 var eventEmitter_1 = __importDefault(require("./../../../config/eventEmitter"));
 var blog_func_1 = require("../func/blog.func");
-var userActives = [];
+var Query_func_1 = require("../func/Query.func");
+var queryHashtag_1 = require("../utils/queryHashtag");
+var token_handler_1 = require("./token.handler");
+var userActives = new Map();
+var InRooomUser = new Map();
 var handleSocket = function (socket) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        console.log('socket connection added', socket.id);
-        socket.on('blogs', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var _blogs;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, (0, blog_func_1.GetBlogPost)()];
-                    case 1:
-                        _blogs = _a.sent();
-                        socket.emit('blogs', JSON.stringify(_blogs));
-                        return [2 /*return*/];
+    var _user, token;
+    var _a, _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
+            case 0:
+                token = (_b = (_a = socket.handshake) === null || _a === void 0 ? void 0 : _a.query) === null || _b === void 0 ? void 0 : _b.token;
+                console.log('connected user', token);
+                if (!token) return [3 /*break*/, 2];
+                return [4 /*yield*/, (0, token_handler_1.HandleToken)(token)];
+            case 1:
+                _user = (_c.sent());
+                if (_user) {
+                    userActives.set(_user === null || _user === void 0 ? void 0 : _user.id, _user);
                 }
-            });
-        }); });
-        eventEmitter_1.default.on('users:active', function (data) {
-            var activeUser = HandleUserCounts(data);
-            socket.broadcast.emit('users:active', activeUser);
-        });
-        eventEmitter_1.default.on('Blog:new', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var _blogs;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, (0, blog_func_1.GetBlogPost)()];
-                    case 1:
-                        _blogs = _a.sent();
-                        socket.broadcast.emit('blogs', JSON.stringify(_blogs));
-                        return [2 /*return*/];
-                }
-            });
-        }); });
-        return [2 /*return*/];
+                _c.label = 2;
+            case 2:
+                socket.on('joined-room', function (data) {
+                    var roomId = InRooomUser.get(data === null || data === void 0 ? void 0 : data.roomId);
+                    InRooomUser.set(data === null || data === void 0 ? void 0 : data.roomId, __spreadArray(__spreadArray([], roomId, true), [data === null || data === void 0 ? void 0 : data.user], false));
+                });
+                socket.on('leave-room', function (data) {
+                    var roomId = InRooomUser.get(data === null || data === void 0 ? void 0 : data.roomId);
+                    var newData = roomId.filter(function (item) { return item !== (data === null || data === void 0 ? void 0 : data.user); });
+                    InRooomUser.set(data === null || data === void 0 ? void 0 : data.roomId, __spreadArray([], newData, true));
+                });
+                socket.on('room-users', function (roomId) { return __awaiter(void 0, void 0, void 0, function () {
+                    var response, data, key, error_1;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                _a.trys.push([0, 2, , 3]);
+                                return [4 /*yield*/, (0, Query_func_1.GetRoomParticipants)(roomId)];
+                            case 1:
+                                response = _a.sent();
+                                data = {
+                                    response: response,
+                                    InRooomUser: InRooomUser,
+                                    userActives: userActives
+                                };
+                                key = (0, queryHashtag_1.QueryHashtagUnique)(roomId);
+                                socket.emit("USER".concat(key), JSON.stringify(data));
+                                socket.broadcast.emit("USER".concat(key), JSON.stringify(data));
+                                return [3 /*break*/, 3];
+                            case 2:
+                                error_1 = _a.sent();
+                                console.log('error found in socket', error_1);
+                                return [3 /*break*/, 3];
+                            case 3: return [2 /*return*/];
+                        }
+                    });
+                }); });
+                socket.on('blogs', function () { return __awaiter(void 0, void 0, void 0, function () {
+                    var _blogs;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, (0, blog_func_1.GetBlogPost)()];
+                            case 1:
+                                _blogs = _a.sent();
+                                socket.emit('blogs', JSON.stringify(_blogs));
+                                return [2 /*return*/];
+                        }
+                    });
+                }); });
+                socket.on('message', function (data) { return __awaiter(void 0, void 0, void 0, function () {
+                    var _messages, roomKey, error_2;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                _a.trys.push([0, 3, , 4]);
+                                if (!(data !== null)) return [3 /*break*/, 2];
+                                return [4 /*yield*/, (0, Query_func_1.GetRoomMessage)(data)];
+                            case 1:
+                                _messages = _a.sent();
+                                roomKey = (0, queryHashtag_1.QueryHashtagUnique)(data);
+                                socket.emit(roomKey, JSON.stringify(_messages));
+                                socket.broadcast.emit(roomKey, JSON.stringify(_messages));
+                                _a.label = 2;
+                            case 2: return [3 /*break*/, 4];
+                            case 3:
+                                error_2 = _a.sent();
+                                console.error("Error fetching messages for room ".concat(data, ":"), error_2);
+                                return [3 /*break*/, 4];
+                            case 4: return [2 /*return*/];
+                        }
+                    });
+                }); });
+                eventEmitter_1.default.on('Blog:new', function () { return __awaiter(void 0, void 0, void 0, function () {
+                    var _blogs;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, (0, blog_func_1.GetBlogPost)()];
+                            case 1:
+                                _blogs = _a.sent();
+                                socket.broadcast.emit('blogs', JSON.stringify(_blogs));
+                                return [2 /*return*/];
+                        }
+                    });
+                }); });
+                eventEmitter_1.default.on('message', function (data) { return __awaiter(void 0, void 0, void 0, function () {
+                    var _messages, roomKey;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, (0, Query_func_1.GetRoomMessage)(data.roomId)];
+                            case 1:
+                                _messages = _a.sent();
+                                roomKey = (0, queryHashtag_1.QueryHashtagUnique)(data.roomId);
+                                socket.broadcast.emit(roomKey, _messages);
+                                return [2 /*return*/];
+                        }
+                    });
+                }); });
+                socket.on('disconnect', function (token) { return __awaiter(void 0, void 0, void 0, function () {
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                console.log('disconnected the', token);
+                                if (!token) return [3 /*break*/, 2];
+                                return [4 /*yield*/, (0, token_handler_1.HandleToken)(token)];
+                            case 1:
+                                _user = (_a.sent());
+                                if (_user) {
+                                    userActives.delete(_user === null || _user === void 0 ? void 0 : _user.id);
+                                }
+                                _a.label = 2;
+                            case 2: return [2 /*return*/];
+                        }
+                    });
+                }); });
+                return [2 /*return*/];
+        }
     });
 }); };
 exports.handleSocket = handleSocket;
-function HandleUserCounts(data) {
-    if (!userActives.includes(data)) {
-        userActives.push(data);
-    }
-    return userActives.length;
-}
-exports.HandleUserCounts = HandleUserCounts;

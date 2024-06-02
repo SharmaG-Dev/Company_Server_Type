@@ -20,6 +20,7 @@ publicRoutes.route('/get').get((0, validators_1.ValidateWithSchema)(validator_sc
 privateRoutes.route('/delete').delete((0, validators_1.ValidateWithSchema)(validator_schema_1.BlogDeleteSchema, validator_func_1.validateQuery), blog_controller_1.handleDeleteBlog);
 privateRoutes.route('/profile-blogs/:profileId').get(blog_controller_1.handlGetProfileBlogs);
 privateRoutes.route('/single-blog/:id').get(blog_controller_1.handleGetSingleBlog);
+privateRoutes.route('/queries').get(blog_controller_1.handleGetAllQuery);
 // comments api 
 privateRoutes.route('/comment/:id').post(blog_controller_1.handleCommentCreate);
 privateRoutes.route('/comment-delete/:commentId').delete(blog_controller_1.handleDeleteComment);

@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ViewRegister = exports.RemoveLike = exports.RecordLikes = exports.DeleteComment = exports.CreateComment = exports.GetSubComments = exports.fetchComments = exports.getAllQueries = exports.GetprofileBlogs = exports.DeleteBlog = exports.GetSingleBlog = exports.GetBlogPost = exports.CreateBlogPost = void 0;
 var Client_1 = require("../../../config/Client");
+var Query_func_1 = require("./Query.func");
 function CreateBlogPost(input) {
     return __awaiter(this, void 0, void 0, function () {
         var blogId, _blogTagsData, _blog, _createdBlog;
@@ -80,7 +81,13 @@ function CreateBlogPost(input) {
                         })];
                 case 1:
                     _createdBlog = _a.sent();
-                    return [2 /*return*/, _createdBlog];
+                    console.log('yha tak perfect chal rha');
+                    if (!_createdBlog.isQuerry) return [3 /*break*/, 3];
+                    return [4 /*yield*/, (0, Query_func_1.createQueryRoom)({ QueryBlogId: _createdBlog.id })];
+                case 2:
+                    _a.sent();
+                    _a.label = 3;
+                case 3: return [2 /*return*/, _createdBlog];
             }
         });
     });
@@ -138,35 +145,29 @@ var GetSingleBlog = function (blogId) { return __awaiter(void 0, void 0, void 0,
                     },
                     include: {
                         BlogTags: {
+                            include: {
+                                tag: true,
+                            }
+                        },
+                        Likes: {
                             select: {
-                                tag: {
-                                    select: {
-                                        id: true,
-                                        title: true
+                                userId: true
+                            },
+                            where: {
+                                isComment: false
+                            }
+                        },
+                        _count: {
+                            select: {
+                                comments: true,
+                                Likes: {
+                                    where: {
+                                        isComment: false,
                                     }
                                 }
                             }
                         },
-                        profile: {
-                            select: {
-                                id: true,
-                                name: true,
-                                avatar: true,
-                            },
-                        },
-                        _count: {
-                            select: {
-                                comments: {
-                                    where: { isSubComment: false }
-                                },
-                                Likes: {
-                                    where: { isBlog: true }
-                                },
-                                Views: {
-                                    where: { isBlog: true }
-                                }
-                            }
-                        }
+                        profile: true
                     }
                 })];
             case 1:
@@ -279,7 +280,22 @@ var getAllQueries = function () { return __awaiter(void 0, void 0, void 0, funct
                                 }
                             }
                         },
-                        profile: true
+                        profile: true,
+                        QueryRoom: {
+                            include: {
+                                RoomParticipants: {
+                                    select: {
+                                        profileId: true
+                                    }
+                                },
+                                _count: {
+                                    select: {
+                                        messages: true,
+                                        RoomParticipants: true
+                                    }
+                                }
+                            }
+                        },
                     },
                     orderBy: {
                         createdAt: 'desc'
