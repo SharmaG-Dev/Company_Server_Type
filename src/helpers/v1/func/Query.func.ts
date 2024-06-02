@@ -20,6 +20,34 @@ export const createQueryRoom = async (data: CreateQueryRoomProps) => {
 }
 
 
+export const getRoominfo = async (id: string) => {
+
+  const _getRoom = await prisma.queryRoom.findUnique({
+    where: {
+      id: id
+    },
+    include: {
+      _count: {
+        select: {
+          messages: true,
+          RoomParticipants: true
+        }
+      },
+      RoomParticipants: {
+        include: {
+          profile: true
+        }
+      },
+      messages: true
+    }
+  })
+
+
+
+  return _getRoom
+}
+
+
 export const JoinRoom = async ({
   roomId,
   profileId,
@@ -27,17 +55,19 @@ export const JoinRoom = async ({
   roomId: string
   profileId: string
 }) => {
-  const _findRoom = await prisma.queryRoom.findUnique({ where: { id: roomId } })
 
+  console.log('step 1')
+  const _findRoom = await prisma.queryRoom.findUnique({ where: { id: roomId } })
+  console.log('step 2', _findRoom)
   if (!_findRoom) return 'no room found with this id '
 
   const _joinRoom = await prisma.roomParticipants.create({
     data: {
-      profileId: profileId,
-      Roomid: _findRoom.QueryBlogId,
-    },
+      Roomid: roomId,
+      profileId: profileId
+    }
   })
-
+  console.log('step 3')
   return _joinRoom
 }
 
@@ -64,6 +94,32 @@ export const LeaveRoom = async ({
   return _update
 }
 
+
+
+export const GetRoomMessage = async (roomId: string) => {
+  const _document = await prisma.roomMessages.findMany({
+    where: { queryRoomId: roomId }, include: {
+      profile: true,
+    }
+
+  })
+
+  return _document
+}
+
+
+export const GetRoomParticipants = async (roomId: string) => {
+  const _document = await prisma.roomParticipants.findMany({
+    where: {
+      Roomid: roomId
+    },
+    select: {
+      profile: true,
+      profileId: true
+    }
+  })
+  return _document
+}
 
 
 

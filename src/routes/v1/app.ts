@@ -6,6 +6,8 @@ import UploadRoutes from './upload'
 import AdminRoutes from './admin/index'
 import TagsRoutes from './tags'
 import BlogRoutes from './blog'
+import RoomRoutes from './rooms'
+import MessageRoutes from './message'
 
 
 const router = express.Router()
@@ -17,6 +19,8 @@ router.use('/upload', UploadRoutes)
 router.use('/admin', AdminRoutes)
 router.use('/tags', TagsRoutes)
 router.use('/blog', BlogRoutes)
+router.use('/room', RoomRoutes)
+router.use('/message', MessageRoutes)
 
 
 export default router

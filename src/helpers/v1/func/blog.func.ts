@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { genId, prisma } from '../../../config/Client';
 import { BlogCreateDataType, LikesInput, SubCommentsGet, ViewsInput, commentInputs } from '../../../types/v1/blog';
+import { createQueryRoom } from './Query.func';
 
 
 
@@ -38,6 +39,7 @@ export async function CreateBlogPost(input: BlogCreateDataType) {
     }
 
 
+
     const _createdBlog = await prisma.blog.create({
         data: _blog, include: {
             BlogTags: {
@@ -48,6 +50,14 @@ export async function CreateBlogPost(input: BlogCreateDataType) {
             profile: true
         }
     })
+
+    console.log('yha tak perfect chal rha')
+
+
+    if (_createdBlog.isQuerry) {
+        await createQueryRoom({ QueryBlogId: _createdBlog.id })
+    }
+
     return _createdBlog
 }
 
@@ -100,35 +110,29 @@ export const GetSingleBlog = async (blogId: string) => {
         },
         include: {
             BlogTags: {
+                include: {
+                    tag: true,
+                }
+            },
+            Likes: {
                 select: {
-                    tag: {
-                        select: {
-                            id: true,
-                            title: true
+                    userId: true
+                },
+                where: {
+                    isComment: false
+                }
+            },
+            _count: {
+                select: {
+                    comments: true,
+                    Likes: {
+                        where: {
+                            isComment: false,
                         }
                     }
                 }
             },
-            profile: {
-                select: {
-                    id: true,
-                    name: true,
-                    avatar: true,
-                },
-            },
-            _count: {
-                select: {
-                    comments: {
-                        where: { isSubComment: false }
-                    },
-                    Likes: {
-                        where: { isBlog: true }
-                    },
-                    Views: {
-                        where: { isBlog: true }
-                    }
-                }
-            }
+            profile: true
         }
     })
 
@@ -222,7 +226,22 @@ export const getAllQueries = async () => {
                     }
                 }
             },
-            profile: true
+            profile: true,
+            QueryRoom: {
+                include: {
+                    RoomParticipants: {
+                        select: {
+                            profileId: true
+                        }
+                    },
+                    _count: {
+                        select: {
+                            messages: true,
+                            RoomParticipants: true
+                        }
+                    }
+                }
+            },
         },
         orderBy: {
             createdAt: 'desc'

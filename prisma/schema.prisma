@@ -49,6 +49,7 @@ model Profile {
   friendRequestRecieved FriendsRequest[]   @relation("friendRequestRecieved")
   RoomParticipants      RoomParticipants[]
   ReadMesseges          ReadMesseges[]
+  RoomMessages          RoomMessages[]
 
   @@map("profile")
 }
@@ -71,22 +72,21 @@ model FriendsRequest {
 }
 
 model Blog {
-  id         String      @id @db.VarChar(36)
-  title      String      @db.VarChar(180)
-  sortDisc   String      @db.VarChar(180)
-  images     String[]
-  isQuerry   Boolean     @default(false)
-  isResolved Boolean?
-  longDisc   String      @db.VarChar(8000)
-  BlogTags   BlogTags[]
-  profile    Profile     @relation(fields: [profileId], references: [id])
-  createdAt  DateTime    @default(now())
-  updateAt   DateTime    @updatedAt
-  profileId  String      @db.VarChar(64)
-  comments   Comments[]
-  Likes      Likes[]
-  Views      View[]
-  QueryRoom  QueryRoom[]
+  id        String      @id @db.VarChar(36)
+  title     String      @db.VarChar(180)
+  sortDisc  String      @db.VarChar(180)
+  images    String[]
+  isQuerry  Boolean     @default(false)
+  longDisc  String      @db.VarChar(8000)
+  BlogTags  BlogTags[]
+  profile   Profile     @relation(fields: [profileId], references: [id])
+  createdAt DateTime    @default(now())
+  updateAt  DateTime    @updatedAt
+  profileId String      @db.VarChar(64)
+  comments  Comments[]
+  Likes     Likes[]
+  Views     View[]
+  QueryRoom QueryRoom[]
 
   @@map("blogs")
 }
@@ -205,12 +205,14 @@ model RoomMessages {
   images       String[]       @db.VarChar(120)
   file         String[]       @db.VarChar(120)
   createdAt    DateTime       @default(now())
-  replyId      String         @db.VarChar(36)
-  replyOf      RoomMessages   @relation("reply", fields: [replyId], references: [id])
+  replyId      String?        @db.VarChar(36)
+  replyOf      RoomMessages?  @relation("reply", fields: [replyId], references: [id])
   repliedTo    RoomMessages[] @relation("reply")
   updatedAt    DateTime       @updatedAt
-  QueryRoom    QueryRoom?     @relation(fields: [queryRoomId], references: [id])
-  queryRoomId  String?
+  QueryRoom    QueryRoom      @relation(fields: [queryRoomId], references: [id])
+  queryRoomId  String
+  profileId    String
+  profile      Profile        @relation(fields: [profileId], references: [id])
   ReadMesseges ReadMesseges[]
 }
 
