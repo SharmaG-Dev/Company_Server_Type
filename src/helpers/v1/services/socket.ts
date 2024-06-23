@@ -26,14 +26,22 @@ export const handleSocket = async (socket: Socket) => {
     }
 
     socket.on('joined-room', (data: { user: string, roomId: string }) => {
+
         const roomId = InRooomUser.get(data?.roomId)
-        InRooomUser.set(data?.roomId, [...roomId, data?.user])
+        if (roomId) {
+            InRooomUser.set(data?.roomId, [...roomId, data?.user])
+        } else {
+            InRooomUser.set(data?.roomId, [data?.user])
+        }
+        console.log(InRooomUser)
     })
 
+    // Leave room lagana baki hai lagao 
     socket.on('leave-room', (data: { user: string, roomId: string }) => {
         const roomId = InRooomUser.get(data?.roomId)
         const newData = roomId.filter((item: string) => item !== data?.user)
         InRooomUser.set(data?.roomId, [...newData])
+        console.log(InRooomUser)
     })
 
 
